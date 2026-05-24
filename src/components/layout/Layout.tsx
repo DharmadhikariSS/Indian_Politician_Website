@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
-import { Search, Map as MapIcon, BarChart3, Info, Home, GitCompare, ShieldCheck } from 'lucide-react';
+import { Search, Map as MapIcon, BarChart3, Info, Home, GitCompare, ShieldCheck, Sparkles } from 'lucide-react';
 
 const Layout = () => {
   return (
@@ -32,6 +32,9 @@ const Layout = () => {
             <Link to="/sources" className="text-text-secondary hover:text-text-primary transition-colors flex items-center gap-1">
               <ShieldCheck size={16} /> Sources
             </Link>
+            <Link to="/democracy-match" className="text-text-secondary hover:text-text-primary transition-colors flex items-center gap-1">
+              <Sparkles size={16} className="text-accent-gold" /> Match Quiz
+            </Link>
           </nav>
 
           <div className="flex items-center space-x-4">
@@ -57,6 +60,7 @@ const Layout = () => {
                 <li><Link to="/rankings" className="hover:text-accent-gold transition-colors">National Rankings</Link></li>
                 <li><Link to="/compare" className="hover:text-accent-gold transition-colors">Compare Engine</Link></li>
                 <li><Link to="/sources" className="hover:text-accent-gold transition-colors">Verification Sources</Link></li>
+                <li><Link to="/democracy-match" className="hover:text-accent-gold transition-colors text-accent-gold font-medium">Democracy Match Quiz</Link></li>
               </ul>
             </div>
             <div>
@@ -91,9 +95,9 @@ const Layout = () => {
             <Home size={20} />
             <span className="text-[10px] mt-1">Home</span>
           </Link>
-          <Link to="/search" className="flex flex-col items-center text-text-secondary hover:text-accent-gold">
-            <Search size={20} />
-            <span className="text-[10px] mt-1">Search</span>
+          <Link to="/democracy-match" className="flex flex-col items-center text-text-secondary hover:text-accent-gold">
+            <Sparkles size={20} className="text-accent-gold" />
+            <span className="text-[10px] mt-1">Match</span>
           </Link>
           <Link to="/compare" className="flex flex-col items-center text-text-secondary hover:text-accent-gold">
             <GitCompare size={20} />

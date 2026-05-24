@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, AlertTriangle, TrendingUp, Users, ShieldAlert, BadgeAlert, Newspaper, ChevronRight } from 'lucide-react';
+import { Search, AlertTriangle, TrendingUp, Users, ShieldAlert, BadgeAlert, Newspaper, ChevronRight, MapPin, Building2, ShieldCheck, Scale, Globe, ArrowRight, Sparkles } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { PoliticianCard } from '../components/ui/PoliticianCard';
 import { usePoliticians } from '../hooks/usePoliticians';
@@ -14,6 +14,53 @@ const WorkAreas = [
 
 const Home = () => {
   const { data: politicians = [], isLoading } = usePoliticians();
+  
+  const [searchPincode, setSearchPincode] = useState('');
+  const [funnelResults, setFunnelResults] = useState<{
+    mp: any | null;
+    mla: any | null;
+    corporator: any | null;
+    pincode: string;
+  } | null>(null);
+  const [funnelError, setFunnelError] = useState('');
+  const [isLocating, setIsLocating] = useState(false);
+
+  const handlePincodeSearch = (pincode: string) => {
+    const trimmed = pincode.trim();
+    if (trimmed.length !== 6 || !/^\d+$/.test(trimmed)) {
+      setFunnelError('Please enter a valid 6-digit Indian PIN Code.');
+      setFunnelResults(null);
+      return;
+    }
+
+    setFunnelError('');
+    
+    // Filter candidates matching the PIN code
+    const matches = politicians.filter(p => p.pincodes?.includes(trimmed));
+
+    if (matches.length === 0) {
+      setFunnelError(`No ballot candidates indexed for PIN Code ${trimmed}. Try searching for 560001, 233001, or 400001.`);
+      setFunnelResults(null);
+      return;
+    }
+
+    const mp = matches.find(p => p.role.includes('MP')) || null;
+    const mla = matches.find(p => p.role === 'MLA') || null;
+    const corporator = matches.find(p => p.role === 'Corporator') || null;
+
+    setFunnelResults({ mp, mla, corporator, pincode: trimmed });
+  };
+
+  const handleLiveGeolocation = () => {
+    setIsLocating(true);
+    setFunnelError('');
+    setTimeout(() => {
+      setIsLocating(false);
+      // Simulate matching to Bangalore Central 560001
+      setSearchPincode('560001');
+      handlePincodeSearch('560001');
+    }, 1200);
+  };
 
   // Extract all news articles and sort them by date descending
   const recentArticles = useMemo(() => {
@@ -81,24 +128,230 @@ const Home = () => {
             Know Your Representatives.<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-gold to-warning-amber">Hold Power Accountable.</span>
           </h1>
-          <p className="max-w-2xl mx-auto text-lg md:text-xl text-text-secondary mb-10 font-sans">
+          <p className="max-w-2xl mx-auto text-lg md:text-xl text-text-secondary mb-8 font-sans">
             Transparent, data-driven insights on every MP, MLA, Minister, Sarpanch, and Mayor across India.
           </p>
           
+          {/* Location Funnel Search Box */}
+          <div className="max-w-3xl mx-auto bg-bg-secondary border border-border-subtle p-6 rounded-2xl shadow-xl space-y-6 text-left mb-10">
+            <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+              <div className="space-y-1">
+                <h3 className="font-heading font-bold text-sm text-text-primary uppercase tracking-wider flex items-center gap-1.5">
+                  <MapPin size={16} className="text-accent-gold" /> Discover Your Local Representatives
+                </h3>
+                <p className="text-[10px] text-text-secondary font-sans leading-normal">
+                  Enter your 6-digit Indian PIN Code or use current location to see your exact ballot MP, MLA, and Corporator.
+                </p>
+              </div>
+              
+              <div className="w-full md:w-auto flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+                <div className="flex items-center gap-2 bg-bg-card border border-border-subtle px-3 py-2 rounded-lg text-xs font-mono w-full sm:w-52">
+                  <input 
+                    type="text" 
+                    maxLength={6}
+                    placeholder="Enter PIN (e.g. 560001)"
+                    value={searchPincode}
+                    onChange={(e) => setSearchPincode(e.target.value.replace(/\D/g, ''))}
+                    className="bg-transparent border-none outline-none w-full text-text-primary placeholder:text-text-secondary"
+                  />
+                </div>
+                
+                <Button 
+                  onClick={() => handlePincodeSearch(searchPincode)}
+                  className="bg-accent-gold hover:bg-accent-gold/80 text-bg-primary font-bold font-mono text-xs px-5 py-2.5 rounded shrink-0 shadow"
+                >
+                  FIND BALLOT
+                </Button>
+                
+                <Button 
+                  onClick={handleLiveGeolocation}
+                  variant="outline"
+                  className="font-mono text-xs px-4 py-2.5 rounded shrink-0 border-border-subtle hover:bg-bg-card text-text-primary flex items-center justify-center gap-1.5"
+                >
+                  {isLocating ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-accent-gold/20 border-t-accent-gold rounded-full animate-spin"></div>
+                      LOCATING...
+                    </>
+                  ) : (
+                    <>
+                      <Globe size={12} className="text-info-blue" /> USE GPS
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            {/* Error alerts */}
+            {funnelError && (
+              <div className="bg-danger-red/10 border border-danger-red/20 rounded-lg p-3 text-danger-red font-mono text-[10px] flex items-center gap-2">
+                <AlertTriangle size={14} className="shrink-0" />
+                <span>{funnelError}</span>
+              </div>
+            )}
+
+            {/* Location Funnel Results Grid */}
+            {funnelResults && (
+              <div className="space-y-5 pt-4 border-t border-border-subtle/50">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="font-mono text-xs font-bold text-accent-gold flex items-center gap-1.5">
+                    <ShieldCheck size={16} /> BALLOT LEDGER FOR PIN CODE: {funnelResults.pincode}
+                  </div>
+                  <button 
+                    onClick={() => {
+                      setFunnelResults(null);
+                      setSearchPincode('');
+                    }}
+                    className="font-mono text-[10px] text-text-secondary hover:text-text-primary underline"
+                  >
+                    RESET SEARCH
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  
+                  {/* MP Tier Card */}
+                  <div className="bg-bg-card border border-border-subtle p-4 rounded-xl flex flex-col justify-between h-full space-y-4">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-mono font-bold text-text-secondary uppercase">1. National (MP)</span>
+                        {funnelResults.mp && (
+                          <span className={`text-[8px] font-mono font-bold px-1.5 py-0.5 border rounded uppercase ${
+                            funnelResults.mp.aiScore >= 70 ? 'text-success-green bg-success-green/5 border-success-green/10' :
+                            funnelResults.mp.aiScore >= 40 ? 'text-warning-amber bg-warning-amber/5 border-warning-amber/10' :
+                            'text-danger-red bg-danger-red/5 border-danger-red/10'
+                          }`}>
+                            AI Score: {funnelResults.mp.aiScore}
+                          </span>
+                        )}
+                      </div>
+                      
+                      {funnelResults.mp ? (
+                        <div className="flex gap-3 items-center text-left">
+                          <img src={funnelResults.mp.photoUrl} alt={funnelResults.mp.name} className="w-10 h-10 object-cover rounded-lg border border-border-subtle shrink-0" />
+                          <div className="min-w-0">
+                            <h4 className="font-heading font-bold text-sm text-text-primary tracking-wide truncate">{funnelResults.mp.name}</h4>
+                            <p className="text-[10px] text-text-secondary font-mono truncate">{funnelResults.mp.party} • {funnelResults.mp.constituency}</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-[10px] text-text-secondary font-sans leading-relaxed">No active Parliamentary MP matching this geographic quadrant in local indices.</p>
+                      )}
+                    </div>
+                    {funnelResults.mp && (
+                      <Link to={`/politician/${funnelResults.mp.id}`} className="pt-2">
+                        <button className="w-full bg-bg-secondary border border-border-subtle hover:bg-bg-card font-mono text-[9px] py-1.5 rounded text-accent-gold font-bold flex items-center justify-center gap-1">
+                          VIEW MP DOSSIER <ArrowRight size={10} />
+                        </button>
+                      </Link>
+                    )}
+                  </div>
+
+                  {/* MLA Tier Card */}
+                  <div className="bg-bg-card border border-border-subtle p-4 rounded-xl flex flex-col justify-between h-full space-y-4">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-mono font-bold text-text-secondary uppercase">2. State Assembly (MLA)</span>
+                        {funnelResults.mla && (
+                          <span className={`text-[8px] font-mono font-bold px-1.5 py-0.5 border rounded uppercase ${
+                            funnelResults.mla.aiScore >= 70 ? 'text-success-green bg-success-green/5 border-success-green/10' :
+                            funnelResults.mla.aiScore >= 40 ? 'text-warning-amber bg-warning-amber/5 border-warning-amber/10' :
+                            'text-danger-red bg-danger-red/5 border-danger-red/10'
+                          }`}>
+                            AI Score: {funnelResults.mla.aiScore}
+                          </span>
+                        )}
+                      </div>
+                      
+                      {funnelResults.mla ? (
+                        <div className="flex gap-3 items-center text-left">
+                          <img src={funnelResults.mla.photoUrl} alt={funnelResults.mla.name} className="w-10 h-10 object-cover rounded-lg border border-border-subtle shrink-0" />
+                          <div className="min-w-0">
+                            <h4 className="font-heading font-bold text-sm text-text-primary tracking-wide truncate">{funnelResults.mla.name}</h4>
+                            <p className="text-[10px] text-text-secondary font-mono truncate">{funnelResults.mla.party} • {funnelResults.mla.constituency}</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-[10px] text-text-secondary font-sans leading-relaxed">No active Assembly MLA matching this geographic quadrant in local indices.</p>
+                      )}
+                    </div>
+                    {funnelResults.mla && (
+                      <Link to={`/politician/${funnelResults.mla.id}`} className="pt-2">
+                        <button className="w-full bg-bg-secondary border border-border-subtle hover:bg-bg-card font-mono text-[9px] py-1.5 rounded text-accent-gold font-bold flex items-center justify-center gap-1">
+                          VIEW MLA DOSSIER <ArrowRight size={10} />
+                        </button>
+                      </Link>
+                    )}
+                  </div>
+
+                  {/* Local Corporator Tier Card */}
+                  <div className="bg-bg-card border border-border-subtle p-4 rounded-xl flex flex-col justify-between h-full space-y-4">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-mono font-bold text-text-secondary uppercase">3. Local Municipal (Corporator)</span>
+                        {funnelResults.corporator && (
+                          <span className={`text-[8px] font-mono font-bold px-1.5 py-0.5 border rounded uppercase ${
+                            funnelResults.corporator.aiScore >= 70 ? 'text-success-green bg-success-green/5 border-success-green/10' :
+                            funnelResults.corporator.aiScore >= 40 ? 'text-warning-amber bg-warning-amber/5 border-warning-amber/10' :
+                            'text-danger-red bg-danger-red/5 border-danger-red/10'
+                          }`}>
+                            AI Score: {funnelResults.corporator.aiScore}
+                          </span>
+                        )}
+                      </div>
+                      
+                      {funnelResults.corporator ? (
+                        <div className="space-y-2">
+                          <div className="flex gap-3 items-center text-left">
+                            <img src={funnelResults.corporator.photoUrl} alt={funnelResults.corporator.name} className="w-10 h-10 object-cover rounded-lg border border-border-subtle shrink-0" />
+                            <div className="min-w-0">
+                              <h4 className="font-heading font-bold text-sm text-text-primary tracking-wide truncate">{funnelResults.corporator.name}</h4>
+                              <p className="text-[10px] text-text-secondary font-mono truncate">{funnelResults.corporator.municipalWard ?? 'Ward Member'}</p>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 text-[8px] font-mono border-t border-border-subtle/50 pt-2 text-left">
+                            <div>
+                              <span className="text-text-secondary block">WARD FUND SPENT:</span>
+                              <span className="text-success-green font-bold">{funnelResults.corporator.localWardFundUtilization}%</span>
+                            </div>
+                            <div>
+                              <span className="text-text-secondary block">GRIEVANCE REDRESSED:</span>
+                              <span className="text-info-blue font-bold">{funnelResults.corporator.grievanceRedressPct}%</span>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-[10px] text-text-secondary font-sans leading-relaxed">No active Ward Corporator matching this geographic quadrant in local indices.</p>
+                      )}
+                    </div>
+                    {funnelResults.corporator && (
+                      <Link to={`/politician/${funnelResults.corporator.id}`} className="pt-2">
+                        <button className="w-full bg-bg-secondary border border-border-subtle hover:bg-bg-card font-mono text-[9px] py-1.5 rounded text-accent-gold font-bold flex items-center justify-center gap-1">
+                          VIEW WARD DOSSIER <ArrowRight size={10} />
+                        </button>
+                      </Link>
+                    )}
+                  </div>
+
+                </div>
+              </div>
+            )}
+          </div>
+
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link to="/democracy-match" className="w-full sm:w-auto">
+              <Button size="lg" className="w-full font-bold bg-accent-gold text-bg-primary hover:bg-accent-gold/80 flex items-center justify-center gap-1.5 shadow-md">
+                <Sparkles className="h-5 w-5 animate-pulse" /> START DEMOCRACY MATCH QUIZ
+              </Button>
+            </Link>
             <Link to="/search" className="w-full sm:w-auto">
-              <Button size="lg" className="w-full font-bold bg-accent-gold text-bg-primary hover:bg-accent-gold/80">
+              <Button size="lg" variant="outline" className="w-full text-text-primary hover:bg-bg-card">
                 <Search className="mr-2 h-5 w-5" /> Search a Politician
               </Button>
             </Link>
             <Link to="/browse" className="w-full sm:w-auto">
-              <Button size="lg" variant="outline" className="w-full">
-                Browse by State
-              </Button>
-            </Link>
-            <Link to="/rankings" className="w-full sm:w-auto">
               <Button size="lg" variant="secondary" className="w-full bg-bg-card border border-border-subtle text-info-blue hover:bg-bg-primary">
-                <ShieldAlert className="mr-2 h-5 w-5" /> AI Integrity Report
+                Browse State Index
               </Button>
             </Link>
           </div>

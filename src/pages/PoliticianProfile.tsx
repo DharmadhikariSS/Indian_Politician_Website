@@ -37,10 +37,11 @@ import {
   ExternalLink,
   ChevronRight,
   BookOpen,
-  Newspaper
+  Newspaper,
+  GitCompare
 } from 'lucide-react';
 import { usePolitician } from '../hooks/usePoliticians';
-import type { DetailedPoliticianData } from '../data/politicians';
+import { mockPoliticians, type DetailedPoliticianData } from '../data/politicians';
 import { IntegrityScoreGauge } from '../components/ui/IntegrityScoreGauge';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
@@ -49,10 +50,15 @@ import { Card, CardContent } from '../components/ui/Card';
 const PoliticianProfile = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'overview' | 'financials' | 'criminal' | 'legislative' | 'press'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'financials' | 'criminal' | 'legislative' | 'press' | 'manifesto'>('overview');
 
   // Find politician by ID using the usePolitician query hook!
   const { data: politician, isLoading } = usePolitician(id);
+
+  const opponent = useMemo(() => {
+    if (!politician || !politician.strongestOpponentId) return null;
+    return mockPoliticians.find(p => p.id === politician.strongestOpponentId) || null;
+  }, [politician]);
 
   if (isLoading) {
     return (
@@ -127,6 +133,14 @@ const PoliticianProfile = () => {
     value: bond.amount,
     color: index === 0 ? '#D4A017' : index === 1 ? '#ED8936' : index === 2 ? '#4299E1' : '#38A169'
   })) || [];
+
+  const manifestoSectorData = useMemo(() => {
+    return politician.manifestoSectorBreakdown?.map((item, index) => ({
+      name: item.sector,
+      value: item.value,
+      color: index === 0 ? '#D4A017' : index === 1 ? '#4299E1' : index === 2 ? '#38A169' : '#ED8936'
+    })) || [];
+  }, [politician]);
 
   const totalBondsAmount = politician.electoralBonds?.reduce((sum, b) => sum + b.amount, 0) || 0;
 
@@ -298,6 +312,16 @@ const PoliticianProfile = () => {
         >
           <Newspaper size={16} /> Press Scan & Audits ({politician.newsArticles?.length || 0})
         </button>
+        <button
+          onClick={() => setActiveTab('manifesto')}
+          className={`flex items-center gap-2 px-5 py-3 text-xs md:text-sm uppercase font-mono font-bold tracking-wider rounded-lg transition-all ${
+            activeTab === 'manifesto' 
+              ? 'bg-bg-card border border-border-subtle text-accent-gold shadow-md' 
+              : 'text-text-secondary hover:text-text-primary'
+          }`}
+        >
+          <FileText size={16} /> Manifesto & Promises ({politician.manifestoPledges?.length || 0})
+        </button>
       </div>
 
       {/* 3. Dynamic Tab Workspace Content */}
@@ -397,6 +421,50 @@ const PoliticianProfile = () => {
                   </p>
                 </CardContent>
               </Card>
+
+              {opponent && (
+                <Card className="border-border-subtle bg-bg-card text-left mt-6">
+                  <CardContent className="p-5 space-y-4">
+                    <h3 className="font-heading text-lg font-bold text-text-primary border-b border-border-subtle pb-2.5 flex items-center gap-1.5">
+                      <GitCompare size={18} className="text-accent-gold" /> STRONGEST OPPOSITION RIVAL
+                    </h3>
+                    
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-xl overflow-hidden border border-border-subtle bg-bg-secondary shrink-0">
+                        <img src={opponent.photoUrl} alt={opponent.name} className="w-full h-full object-cover" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-heading font-bold text-sm text-text-primary truncate">{opponent.name}</h4>
+                          <Badge variant="outline" className="text-[8px] font-mono shrink-0">{opponent.party}</Badge>
+                        </div>
+                        <p className="text-[10px] text-text-secondary font-mono truncate">{opponent.role} • {opponent.constituency}</p>
+                      </div>
+                    </div>
+
+                    <div className="bg-bg-secondary/40 border border-border-subtle/50 p-3.5 rounded-xl space-y-2.5 text-xs font-mono">
+                      <div className="flex justify-between items-center border-b border-border-subtle/50 pb-1.5">
+                        <span className="text-text-secondary uppercase">Integrity Comparison:</span>
+                        <div className="flex items-center gap-2">
+                          <span className={`font-bold ${politician.aiScore < 50 ? 'text-danger-red' : 'text-success-green'}`}>{politician.aiScore}</span>
+                          <span className="text-text-secondary text-[10px] font-bold">vs</span>
+                          <span className={`font-bold ${opponent.aiScore < 50 ? 'text-danger-red' : 'text-success-green'}`}>{opponent.aiScore}</span>
+                        </div>
+                      </div>
+                      <div className="text-[10px] text-text-secondary leading-normal flex items-start gap-1">
+                        <span className="shrink-0 mt-0.5">🎯</span>
+                        <span>{politician.constituencyRivalry?.historicalMarginText ?? 'Contesting regional rival.'}</span>
+                      </div>
+                    </div>
+
+                    <Link to={`/compare?p1=${politician.id}&p2=${opponent.id}`}>
+                      <Button className="w-full bg-accent-gold text-bg-primary hover:bg-accent-gold/80 font-mono font-bold text-xs py-2.5 rounded shadow flex items-center justify-center gap-1.5">
+                        <GitCompare size={14} /> COMPARE DEMOCRACY DUEL
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              )}
             </div>
 
             {/* Right Cols: Complete AI Report Assessment */}
@@ -927,6 +995,164 @@ const PoliticianProfile = () => {
           </div>
         )}
 
+        {/* ===================== TAB 6: MANIFESTO SCAN ===================== */}
+        {activeTab === 'manifesto' && (
+          <div className="space-y-6 text-left">
+            {/* Header info */}
+            <div className="bg-bg-secondary border border-border-subtle rounded-xl p-5 flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="bg-accent-gold/10 p-3 rounded-full shrink-0 border border-accent-gold/20 hidden sm:block">
+                  <FileText size={28} className="text-accent-gold" />
+                </div>
+                <div>
+                  <h3 className="font-heading text-lg font-bold text-text-primary uppercase tracking-wide">
+                    CAMPAIGN MANIFESTO & Speech AGENDA AUDIT
+                  </h3>
+                  <p className="text-xs text-text-secondary leading-relaxed font-sans max-w-xl mt-1">
+                    Auditing what they promised vs how they behave. We parse campaign speeches, manifesto filings, and public pledges and cross-reference them against actual legislative votes.
+                  </p>
+                </div>
+              </div>
+
+              {politician.agendaExecutionRate !== undefined && (
+                <div className="bg-bg-secondary/70 border border-border-subtle px-6 py-3 rounded-xl font-mono text-center shadow shrink-0">
+                  <span className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">AGENDA EXECUTION RATE</span>
+                  <p className={`text-3xl font-bold mt-0.5 ${
+                    politician.agendaExecutionRate >= 70 ? 'text-success-green' :
+                    politician.agendaExecutionRate >= 45 ? 'text-warning-amber' :
+                    'text-danger-red'
+                  }`}>{politician.agendaExecutionRate}%</p>
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              
+              {/* Left Column: Sector Allocation Chart (5 cols) */}
+              <div className="lg:col-span-5 space-y-6">
+                <Card className="border-border-subtle bg-bg-card">
+                  <CardContent className="p-5 space-y-4">
+                    <h3 className="font-heading text-base font-bold text-text-primary border-b border-border-subtle pb-2.5">
+                      PLEDGED SECTOR ALLOCATIONS
+                    </h3>
+                    
+                    {manifestoSectorData.length > 0 ? (
+                      <div className="space-y-4">
+                        <div className="h-56 relative flex items-center justify-center">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                              <Pie
+                                data={manifestoSectorData}
+                                cx="50%"
+                                cy="50%"
+                                innerRadius={60}
+                                outerRadius={80}
+                                paddingAngle={4}
+                                dataKey="value"
+                              >
+                                {manifestoSectorData.map((entry, index) => (
+                                  <Cell key={`cell-${index}`} fill={entry.color} />
+                                ))}
+                              </Pie>
+                              <Tooltip 
+                                content={({ active, payload }: any) => {
+                                  if (active && payload && payload.length) {
+                                    return (
+                                      <div className="bg-bg-secondary border border-border-subtle p-2 rounded font-mono text-[10px]">
+                                        <p className="font-bold text-text-primary">{payload[0].name.toUpperCase()}</p>
+                                        <p className="text-accent-gold font-bold">{payload[0].value}% weight</p>
+                                      </div>
+                                    );
+                                  }
+                                  return null;
+                                }}
+                              />
+                            </PieChart>
+                          </ResponsiveContainer>
+                          <div className="absolute text-center space-y-0.5">
+                            <span className="text-[10px] text-text-secondary font-mono block uppercase">PRIMARY FOCUS</span>
+                            <span className="text-sm font-heading font-bold text-text-primary">
+                              {manifestoSectorData[0]?.name.toUpperCase() ?? 'N/A'}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Custom Legend */}
+                        <div className="grid grid-cols-2 gap-2 text-[10px] font-mono border-t border-border-subtle/50 pt-4">
+                          {manifestoSectorData.map((entry, index) => (
+                            <div key={index} className="flex items-center gap-1.5">
+                              <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: entry.color }} />
+                              <span className="text-text-secondary truncate uppercase">{entry.name}:</span>
+                              <span className="font-bold text-text-primary">{entry.value}%</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="h-56 flex flex-col items-center justify-center text-center text-text-secondary text-xs">
+                        No semantic manifesto sectors parsed for this representative.
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Audit Preventative Disclaimer */}
+                <Card className="border-danger-red/20 bg-danger-red/5">
+                  <CardContent className="p-4 space-y-2 text-xs text-text-secondary leading-relaxed">
+                    <h4 className="font-mono font-bold text-danger-red text-[10px] uppercase tracking-wider flex items-center gap-1">
+                      ⚠️ Promise vs. Vote Audit Loophole Flag
+                    </h4>
+                    <p className="font-sans">
+                      Politicians frequently promise high expenditure on key welfare items (like water supply or health centers) during election campaigns but systematically vote against state allocations or let local development funds lapse. Our system parses local assembly minutes to compute actual alignment.
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Right Column: Pledges Audited list (7 cols) */}
+              <div className="lg:col-span-7 space-y-6">
+                <Card className="border-border-subtle bg-bg-card">
+                  <CardContent className="p-5 space-y-4">
+                    <h3 className="font-heading text-base font-bold text-text-primary border-b border-border-subtle pb-2.5">
+                      AUDITED CAMPAIGN promises STATUS
+                    </h3>
+
+                    {politician.manifestoPledges && politician.manifestoPledges.length > 0 ? (
+                      <div className="space-y-3">
+                        {politician.manifestoPledges.map((pledge, idx) => (
+                          <div 
+                            key={idx} 
+                            className="bg-bg-secondary border border-border-subtle/70 rounded-xl p-4 flex items-center justify-between gap-4 font-sans text-xs"
+                          >
+                            <div className="space-y-1 text-left min-w-0">
+                              <span className="text-[9px] font-mono text-text-secondary uppercase">{pledge.category}</span>
+                              <p className="font-medium text-text-primary leading-normal truncate">{pledge.pledge}</p>
+                            </div>
+                            
+                            <Badge 
+                              variant={
+                                pledge.status === 'Fulfilled' ? 'success' :
+                                pledge.status === 'Progress' ? 'info' : 'outline'
+                              }
+                              className="font-mono text-[9px] uppercase tracking-widest shrink-0"
+                            >
+                              {pledge.status}
+                            </Badge>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-12 text-center text-text-secondary text-xs">
+                        No election pledges or campaign promise filings are mapped under this representative's file.
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+
+            </div>
+          </div>
+        )}
       </div>
 
     </div>

@@ -12,6 +12,7 @@ const Rankings = lazy(() => import('./pages/Rankings'));
 const Search = lazy(() => import('./pages/Search'));
 const About = lazy(() => import('./pages/About'));
 const Sources = lazy(() => import('./pages/Sources'));
+const DemocracyMatch = lazy(() => import('./pages/DemocracyMatch'));
 
 const LoadingFallback = () => (
   <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
@@ -68,6 +69,11 @@ function App() {
           <Route path="sources" element={
             <Suspense fallback={<LoadingFallback />}>
               <Sources />
+            </Suspense>
+          } />
+          <Route path="democracy-match" element={
+            <Suspense fallback={<LoadingFallback />}>
+              <DemocracyMatch />
             </Suspense>
           } />
         </Route>

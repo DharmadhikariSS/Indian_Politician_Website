@@ -59,6 +59,28 @@ export interface DetailedPoliticianData extends PoliticianData {
     date: string;
   }[];
   newsArticles?: NewsArticle[];
+  
+  // v4.0 Hyper-Localized & Decisions Additions
+  pincodes?: string[];
+  municipalWard?: string;
+  strongestOpponentId?: string;
+  constituencyRivalry?: {
+    opponentName: string;
+    marginPercent: number;
+    historicalMarginText: string;
+  };
+  manifestoPledges?: {
+    category: string;
+    pledge: string;
+    status: 'Fulfilled' | 'Progress' | 'Lapsed';
+  }[];
+  manifestoSectorBreakdown?: {
+    sector: string;
+    value: number;
+  }[];
+  agendaExecutionRate?: number;
+  localWardFundUtilization?: number;
+  grievanceRedressPct?: number;
 }
 
 export const mockPoliticians: DetailedPoliticianData[] = [
@@ -168,7 +190,24 @@ export const mockPoliticians: DetailedPoliticianData[] = [
         summary: 'MLA Rajendra Singh authorized immediate transfer of discretionary development funds to renovate laboratories and classrooms at three state high schools in Ghazipur sadar.',
         url: '#'
       }
-    ]
+    ],
+    pincodes: ['233001'],
+    strongestOpponentId: '13',
+    constituencyRivalry: { opponentName: 'Vikram Yadav', marginPercent: 4.8, historicalMarginText: '4,850 votes margin in 2022 assembly elections' },
+    agendaExecutionRate: 40,
+    manifestoSectorBreakdown: [
+      { sector: 'Infrastructure', value: 45 },
+      { sector: 'Welfare Schemes', value: 30 },
+      { sector: 'Healthcare', value: 15 },
+      { sector: 'Education', value: 10 }
+    ],
+    manifestoPledges: [
+      { category: 'Infrastructure', pledge: 'Establish Ghazipur Ring Road project', status: 'Lapsed' },
+      { category: 'Welfare Schemes', pledge: 'Provide ₹2,000 monthly farm subsidy', status: 'Fulfilled' },
+      { category: 'Education', pledge: 'Construct 5 new public high schools', status: 'Progress' }
+    ],
+    localWardFundUtilization: 72,
+    grievanceRedressPct: 60
   },
   {
     id: '2',
@@ -258,7 +297,22 @@ export const mockPoliticians: DetailedPoliticianData[] = [
         summary: 'Dr. Kumar pushed for strict standards on multi-modal fare systems and public-private transit integration during the IT Parliamentary Panel meeting.',
         url: '#'
       }
-    ]
+    ],
+    pincodes: ['560001'],
+    strongestOpponentId: '11',
+    constituencyRivalry: { opponentName: 'Ananya Rao', marginPercent: 1.8, historicalMarginText: '12,500 votes margin in 2019 Lok Sabha elections' },
+    agendaExecutionRate: 65,
+    manifestoSectorBreakdown: [
+      { sector: 'Infrastructure', value: 50 },
+      { sector: 'Tech Projects', value: 30 },
+      { sector: 'Welfare', value: 20 }
+    ],
+    manifestoPledges: [
+      { category: 'Infrastructure', pledge: 'Expand Bangalore Metro Phase 3 funding', status: 'Fulfilled' },
+      { category: 'Tech Projects', pledge: 'Launch 5 regional citizen-tech incubation hubs', status: 'Progress' }
+    ],
+    localWardFundUtilization: 85,
+    grievanceRedressPct: 78
   },
   {
     id: '3',
@@ -898,7 +952,253 @@ export const mockPoliticians: DetailedPoliticianData[] = [
       { donor: 'Singhania Shipping Group', amount: 150.0, date: '2021-12-10' },
       { donor: 'Apex Global Logistics BVI', amount: 80.0, date: '2022-05-04' },
       { donor: 'Deccan Steel Consortium', amount: 65.0, date: '2023-01-15' }
-    ]
+    ],
+    pincodes: ['400001'],
+    strongestOpponentId: '14',
+    constituencyRivalry: { opponentName: 'Suresh Mehta', marginPercent: 18.2, historicalMarginText: '18.2% margin in 2022 Rajya Sabha assembly distribution votes' },
+    agendaExecutionRate: 15,
+    manifestoSectorBreakdown: [
+      { sector: 'Infrastructure', value: 80 },
+      { sector: 'Industry Subsidies', value: 20 }
+    ],
+    manifestoPledges: [
+      { category: 'Infrastructure', pledge: 'Construct private deep-sea shipping channel', status: 'Lapsed' }
+    ],
+    localWardFundUtilization: 20,
+    grievanceRedressPct: 25
+  },
+  {
+    id: '11',
+    name: 'Ananya Rao',
+    role: 'Corporator',
+    party: 'REG',
+    state: 'Karnataka',
+    photoUrl: 'https://placehold.co/400x400/1C2128/E6EDF3?text=Ananya+Rao',
+    isVerified: true,
+    aiScore: 84,
+    netWorth: '3.5Cr',
+    netWorthGrowth: 15,
+    criminalCases: 0,
+    attendancePct: 94,
+    gender: 'Female',
+    age: 38,
+    constituency: 'Shivaji Nagar Ward 142',
+    termCount: 1,
+    education: 'Post Graduate (Master of Public Policy)',
+    panNumber: 'ABAPR****K',
+    activeSince: 2021,
+    biography: 'Ananya Rao is the Corporator representing Shivaji Nagar Ward 142 in Bangalore Central. With an education in Public Policy, her work is heavily localized around drinking water distribution, street light grids, and sanitation services.',
+    flags: { goodWork: true },
+    integrityDetails: {
+      financialIntegrity: 88,
+      publicService: 90,
+      criminalHistory: 99,
+      riskLevel: 'LOW',
+      summary: 'Ananya Rao displays outstanding municipal public service parameters, holding a 94% local ward attendance and a high 92% grievance resolution rating.',
+      riskFactors: [],
+      positiveContributions: [
+        '92% public grievance completion rate in Ward 142',
+        'Constructed 12 local e-toilets and drinking water kiosks',
+        'Utilized 88% of Ward area development funds on primary sewer retrofits'
+      ]
+    },
+    financialTimeline: [
+      { year: 2021, assets: 3.0, liabilities: 0.2, sources: ['Salary', 'Inherited family flat'] },
+      { year: 2026, assets: 3.5, liabilities: 0.0, sources: ['Salary', 'Mutual funds'] }
+    ],
+    criminalCaseList: [],
+    pincodes: ['560001'],
+    municipalWard: 'Ward 142 (Shivaji Nagar)',
+    strongestOpponentId: '12',
+    constituencyRivalry: { opponentName: 'Rajesh Gowda', marginPercent: 3.2, historicalMarginText: '350 votes victory in Shivaji Nagar Ward 2021 municipal elections' },
+    agendaExecutionRate: 85,
+    manifestoSectorBreakdown: [
+      { sector: 'Sanitation', value: 40 },
+      { sector: 'Water Supply', value: 35 },
+      { sector: 'Street Lighting', value: 15 },
+      { sector: 'Road Repair', value: 10 }
+    ],
+    manifestoPledges: [
+      { category: 'Sanitation', pledge: 'Upgrade municipal waste sorting channels', status: 'Fulfilled' },
+      { category: 'Water Supply', pledge: '24/7 water connection to low-income blocks', status: 'Progress' }
+    ],
+    localWardFundUtilization: 88,
+    grievanceRedressPct: 92
+  },
+  {
+    id: '12',
+    name: 'Rajesh Gowda',
+    role: 'Corporator',
+    party: 'IND',
+    state: 'Karnataka',
+    photoUrl: 'https://placehold.co/400x400/1C2128/E6EDF3?text=Rajesh+Gowda',
+    isVerified: false,
+    aiScore: 48,
+    netWorth: '12.5Cr',
+    netWorthGrowth: 240,
+    criminalCases: 2,
+    attendancePct: 55,
+    gender: 'Male',
+    age: 46,
+    constituency: 'Shivaji Nagar Ward 142',
+    termCount: 2,
+    education: 'Undergraduate (B.A.)',
+    panNumber: 'FGHPK****R',
+    activeSince: 2016,
+    biography: 'Rajesh Gowda is a municipal politician contesting Shivaji Nagar Ward 142 in Bangalore Central. He served as the former local ward councillor and represents local real estate and construction consortiums.',
+    flags: { cronyism: true },
+    integrityDetails: {
+      financialIntegrity: 40,
+      publicService: 45,
+      criminalHistory: 60,
+      riskLevel: 'MEDIUM',
+      summary: 'Rajesh Gowda shows high-risk factors including a 240% asset growth over his term and 2 pending land-encroachment dockets.',
+      riskFactors: [
+        '240% asset growth in ward (₹3.6Cr to ₹12.5Cr)',
+        '2 pending land-dispute cases in local municipal court'
+      ],
+      positiveContributions: [
+        'Funded two local youth centers in Shivaji Nagar'
+      ]
+    },
+    financialTimeline: [
+      { year: 2016, assets: 3.6, liabilities: 0.8, sources: ['Construction brokerage'] },
+      { year: 2021, assets: 12.5, liabilities: 4.2, sources: ['Land partnerships', 'Brokerage commissions'] }
+    ],
+    criminalCaseList: [
+      {
+        caseNumber: 'FIR 88/2020',
+        charges: ['Encroachment of municipal property', 'Public nuisance'],
+        sections: ['IPC Sec 441', 'IPC Sec 290'],
+        court: 'City Civil Court, Bangalore',
+        status: 'Bail Granted',
+        date: '2020-03-10'
+      }
+    ],
+    pincodes: ['560001'],
+    municipalWard: 'Ward 142 (Shivaji Nagar)',
+    strongestOpponentId: '11',
+    constituencyRivalry: { opponentName: 'Ananya Rao', marginPercent: 3.2, historicalMarginText: '350 votes deficit in Shivaji Nagar Ward 2021 municipal elections' },
+    agendaExecutionRate: 30,
+    manifestoSectorBreakdown: [
+      { sector: 'Road Repair', value: 50 },
+      { sector: 'Welfare Subsidies', value: 30 },
+      { sector: 'Sanitation', value: 20 }
+    ],
+    manifestoPledges: [
+      { category: 'Road Repair', pledge: 'Pothole-free Shivaji Nagar lanes', status: 'Lapsed' }
+    ],
+    localWardFundUtilization: 45,
+    grievanceRedressPct: 50
+  },
+  {
+    id: '13',
+    name: 'Vikram Yadav',
+    role: 'Corporator',
+    party: 'IND',
+    state: 'Uttar Pradesh',
+    photoUrl: 'https://placehold.co/400x400/1C2128/E6EDF3?text=Vikram+Yadav',
+    isVerified: true,
+    aiScore: 72,
+    netWorth: '1.8Cr',
+    netWorthGrowth: 20,
+    criminalCases: 0,
+    attendancePct: 88,
+    gender: 'Male',
+    age: 35,
+    constituency: 'Ghazipur Ward 4',
+    termCount: 1,
+    education: 'Graduate (B.Sc. Agriculture)',
+    panNumber: 'ABYPV****L',
+    activeSince: 2022,
+    biography: 'Vikram Yadav represents Ghazipur municipal Ward 4 as Corporator. An agrarian advocate, he leads local canal renovations and clean water pipe connections.',
+    flags: { goodWork: true },
+    integrityDetails: {
+      financialIntegrity: 85,
+      publicService: 78,
+      criminalHistory: 99,
+      riskLevel: 'LOW',
+      summary: 'Vikram Yadav has maintained a clean record and high ward fund utilization (82%).',
+      riskFactors: [],
+      positiveContributions: [
+        'Completed clean canal pipelines for Ward 4 farmers',
+        'Grievance resolution speed under 48 hours'
+      ]
+    },
+    financialTimeline: [
+      { year: 2022, assets: 1.5, liabilities: 0.1, sources: ['Agriculture'] },
+      { year: 2027, assets: 1.8, liabilities: 0.0, sources: ['Agriculture', 'Ward salary'] }
+    ],
+    criminalCaseList: [],
+    pincodes: ['233001'],
+    municipalWard: 'Ward 4 (Ghazipur Ward)',
+    strongestOpponentId: '1',
+    constituencyRivalry: { opponentName: 'Rajendra Singh', marginPercent: 12.5, historicalMarginText: 'Incumbent local assembly representative alignment' },
+    agendaExecutionRate: 90,
+    manifestoSectorBreakdown: [
+      { sector: 'Water Supply', value: 60 },
+      { sector: 'Sanitation', value: 40 }
+    ],
+    manifestoPledges: [
+      { category: 'Water Supply', pledge: 'Drill 3 high-yield community borewells', status: 'Fulfilled' }
+    ],
+    localWardFundUtilization: 82,
+    grievanceRedressPct: 85
+  },
+  {
+    id: '14',
+    name: 'Suresh Mehta',
+    role: 'Corporator',
+    party: 'NAT',
+    state: 'Maharashtra',
+    photoUrl: 'https://placehold.co/400x400/1C2128/E6EDF3?text=Suresh+Mehta',
+    isVerified: true,
+    aiScore: 80,
+    netWorth: '5.2Cr',
+    netWorthGrowth: 25,
+    criminalCases: 0,
+    attendancePct: 92,
+    gender: 'Male',
+    age: 50,
+    constituency: 'Colaba Ward 22',
+    termCount: 2,
+    education: 'Post Graduate (Master of Arts)',
+    panNumber: 'ABMPM****L',
+    activeSince: 2017,
+    biography: 'Suresh Mehta is the Corporator for Ward 22 (Colaba) in Mumbai South. He works heavily in municipal park restorations, heritage lane conservation, and sewage line upgrades.',
+    flags: { goodWork: true },
+    integrityDetails: {
+      financialIntegrity: 82,
+      publicService: 80,
+      criminalHistory: 99,
+      riskLevel: 'LOW',
+      summary: 'Suresh Mehta shows excellent municipal parameters, with zero pending cases, an 80% public service score, and 92% attendance.',
+      riskFactors: [],
+      positiveContributions: [
+        'Restored 2 heritage municipal gardens in Colaba',
+        'Upgraded storm-water drains in highly flooded ward coordinates'
+      ]
+    },
+    financialTimeline: [
+      { year: 2017, assets: 4.1, liabilities: 0.5, sources: ['Consulting'] },
+      { year: 2022, assets: 5.2, liabilities: 0.2, sources: ['Salary', 'Investment returns'] }
+    ],
+    criminalCaseList: [],
+    pincodes: ['400001'],
+    municipalWard: 'Ward 22 (Colaba)',
+    strongestOpponentId: '10',
+    constituencyRivalry: { opponentName: 'Vikram Singhania', marginPercent: 18.2, historicalMarginText: 'Maintains independent ward administration separate from shipping tycoon projects' },
+    agendaExecutionRate: 88,
+    manifestoSectorBreakdown: [
+      { sector: 'Road Repair', value: 45 },
+      { sector: 'Sanitation', value: 35 },
+      { sector: 'Green Projects', value: 20 }
+    ],
+    manifestoPledges: [
+      { category: 'Road Repair', pledge: 'Upgrade Colaba heritage walking paths', status: 'Fulfilled' }
+    ],
+    localWardFundUtilization: 85,
+    grievanceRedressPct: 88
   },
   {
     "id": "scraped-1",
