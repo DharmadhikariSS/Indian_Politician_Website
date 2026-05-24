@@ -134,13 +134,11 @@ const PoliticianProfile = () => {
     color: index === 0 ? '#D4A017' : index === 1 ? '#ED8936' : index === 2 ? '#4299E1' : '#38A169'
   })) || [];
 
-  const manifestoSectorData = useMemo(() => {
-    return politician.manifestoSectorBreakdown?.map((item, index) => ({
-      name: item.sector,
-      value: item.value,
-      color: index === 0 ? '#D4A017' : index === 1 ? '#4299E1' : index === 2 ? '#38A169' : '#ED8936'
-    })) || [];
-  }, [politician]);
+  const manifestoSectorData = politician.manifestoSectorBreakdown?.map((item, index) => ({
+    name: item.sector,
+    value: item.value,
+    color: index === 0 ? '#D4A017' : index === 1 ? '#4299E1' : index === 2 ? '#38A169' : '#ED8936'
+  })) || [];
 
   const totalBondsAmount = politician.electoralBonds?.reduce((sum, b) => sum + b.amount, 0) || 0;
 
