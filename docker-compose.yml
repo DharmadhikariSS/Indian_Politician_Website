@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # Primary Relational Database Server (PostgreSQL)
+  postgres_db:
+    image: postgres:16-alpine
+    container_name: netattrack_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: neta_admin
+      POSTGRES_PASSWORD: NetaSecurePassword2026
+      POSTGRES_DB: netattrack_prod
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Automated schema initialization mount
+      - ./supabase/migrations:/docker-entrypoint-initdb.d
+    networks:
+      - netattrack_network
+
+  # High-performance Caching Server (Redis) - Caches Volatile Press sentiment & Social crawl API payloads
+  redis_cache:
+    image: redis:7-alpine
+    container_name: netattrack_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    networks:
+      - netattrack_network
+
+  # Database Admin UI (pgAdmin) - Optional for easy GUI inspections
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: netattrack_pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@netattrack.org
+      PGADMIN_DEFAULT_PASSWORD: PgAdminSecurePassword2026
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres_db
+    networks:
+      - netattrack_network
+
+volumes:
+  pgdata:
+    driver: local
+  redisdata:
+    driver: local
+
+networks:
+  netattrack_network:
+    driver: bridge
