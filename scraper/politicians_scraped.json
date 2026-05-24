@@ -12,6 +12,7 @@
     "activeSince": 2015,
     "netWorth": "0Cr",
     "netWorthGrowth": 15,
+    "disclaimer": "synthetic_test_data",
     "financialTimeline": [
       {
         "year": 2014,
@@ -82,10 +83,11 @@
     "age": 50,
     "gender": "Male",
     "education": "Graduate",
-    "panNumber": "08876345",
+    "panNumber": "XXXXX****X",
     "activeSince": 2015,
     "netWorth": "0Cr",
     "netWorthGrowth": 15,
+    "disclaimer": "synthetic_test_data",
     "financialTimeline": [
       {
         "year": 2014,
@@ -160,10 +162,11 @@
     "age": 50,
     "gender": "Male",
     "education": "Graduate",
-    "panNumber": "08876345",
+    "panNumber": "XXXXX****X",
     "activeSince": 2015,
     "netWorth": "0Cr",
     "netWorthGrowth": 15,
+    "disclaimer": "synthetic_test_data",
     "financialTimeline": [
       {
         "year": 2014,
@@ -238,10 +241,11 @@
     "age": 50,
     "gender": "Male",
     "education": "Graduate",
-    "panNumber": "08876345",
+    "panNumber": "XXXXX****X",
     "activeSince": 2015,
     "netWorth": "0Cr",
     "netWorthGrowth": 15,
+    "disclaimer": "synthetic_test_data",
     "financialTimeline": [
       {
         "year": 2014,
@@ -317,10 +321,11 @@
     "age": 50,
     "gender": "Male",
     "education": "Graduate",
-    "panNumber": "02823475",
+    "panNumber": "XXXXX****X",
     "activeSince": 2015,
     "netWorth": "0Cr",
     "netWorthGrowth": 15,
+    "disclaimer": "synthetic_test_data",
     "financialTimeline": [
       {
         "year": 2014,

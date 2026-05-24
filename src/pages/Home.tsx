@@ -36,6 +36,34 @@ const Home = () => {
       .slice(0, 4);
   }, [politicians]);
 
+  // Derive dynamic stats from parsed ECI records
+  const stats = useMemo(() => {
+    const totalTracked = politicians.length;
+    const totalCases = politicians.reduce((acc, p) => acc + (p.criminalCases || 0), 0);
+    
+    // Average Net Worth Growth percentage
+    const growthValues = politicians
+      .map(p => p.netWorthGrowth)
+      .filter(g => typeof g === 'number' && g >= 0);
+    
+    const avgGrowth = growthValues.length > 0 
+      ? Math.round(growthValues.reduce((acc, g) => acc + g, 0) / growthValues.length) 
+      : 20;
+
+    // Scan for flagged markers
+    const scamLinked = politicians.filter(p => {
+      const f = p.flags || {};
+      return f.offshoreLink || f.cronyism || f.edRaid || f.convicted;
+    }).length;
+
+    return {
+      totalTracked,
+      totalCases,
+      avgGrowth,
+      scamLinked
+    };
+  }, [politicians]);
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
@@ -77,19 +105,27 @@ const Home = () => {
 
           <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 border-t border-border-subtle pt-10">
             <div className="flex flex-col items-center">
-              <span className="text-3xl font-mono font-bold text-text-primary">12,450+</span>
+              <span className="text-3xl font-mono font-bold text-text-primary">
+                {isLoading ? '...' : `${stats.totalTracked}+`}
+              </span>
               <span className="text-xs uppercase tracking-wider text-text-secondary mt-1">Politicians Tracked</span>
             </div>
             <div className="flex flex-col items-center">
-              <span className="text-3xl font-mono font-bold text-danger-red">4,231</span>
+              <span className="text-3xl font-mono font-bold text-danger-red">
+                {isLoading ? '...' : stats.totalCases}
+              </span>
               <span className="text-xs uppercase tracking-wider text-text-secondary mt-1">Cases Pending</span>
             </div>
             <div className="flex flex-col items-center">
-              <span className="text-3xl font-mono font-bold text-warning-amber">₹4.2Cr</span>
+              <span className="text-3xl font-mono font-bold text-warning-amber">
+                {isLoading ? '...' : `${stats.avgGrowth}%`}
+              </span>
               <span className="text-xs uppercase tracking-wider text-text-secondary mt-1">Avg Asset Growth</span>
             </div>
             <div className="flex flex-col items-center">
-              <span className="text-3xl font-mono font-bold text-accent-gold">142</span>
+              <span className="text-3xl font-mono font-bold text-accent-gold">
+                {isLoading ? '...' : stats.scamLinked}
+              </span>
               <span className="text-xs uppercase tracking-wider text-text-secondary mt-1">Scam Linked</span>
             </div>
           </div>
@@ -99,12 +135,12 @@ const Home = () => {
       {/* Ticker */}
       <div className="bg-bg-card border-b border-border-subtle overflow-hidden flex whitespace-nowrap py-3">
         <div className="animate-marquee flex items-center gap-8 font-mono text-sm text-text-secondary">
-          <span className="flex items-center text-danger-red"><AlertTriangle size={14} className="mr-1"/> 233 MPs have criminal cases pending</span>
-          <span className="flex items-center"><TrendingUp size={14} className="mr-1"/> ₹4.2Cr avg asset growth per term</span>
-          <span className="flex items-center text-warning-amber"><AlertTriangle size={14} className="mr-1"/> 42 politicians linked to offshore accounts</span>
-          <span className="flex items-center text-success-green"><Users size={14} className="mr-1"/> 85 new Sarpanches added this week</span>
+          <span className="flex items-center text-danger-red"><AlertTriangle size={14} className="mr-1"/> {isLoading ? '...' : stats.totalCases} pending criminal cases tracked</span>
+          <span className="flex items-center"><TrendingUp size={14} className="mr-1"/> {isLoading ? '...' : `${stats.avgGrowth}%`} average net worth growth per term</span>
+          <span className="flex items-center text-warning-amber"><AlertTriangle size={14} className="mr-1"/> {isLoading ? '...' : stats.scamLinked} politicians with active wealth discrepancy tags</span>
+          <span className="flex items-center text-success-green"><Users size={14} className="mr-1"/> 100% independent civic transparency registry</span>
           {/* Duplicate for infinite loop illusion */}
-          <span className="flex items-center text-danger-red"><AlertTriangle size={14} className="mr-1"/> 233 MPs have criminal cases pending</span>
+          <span className="flex items-center text-danger-red"><AlertTriangle size={14} className="mr-1"/> {isLoading ? '...' : stats.totalCases} pending criminal cases tracked</span>
         </div>
       </div>
 
