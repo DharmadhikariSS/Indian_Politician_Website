@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
-import { Search, Map as MapIcon, BarChart3, Info, Home, GitCompare } from 'lucide-react';
+import { Search, Map as MapIcon, BarChart3, Info, Home, GitCompare, ShieldCheck } from 'lucide-react';
 
 const Layout = () => {
   return (
@@ -29,6 +29,9 @@ const Layout = () => {
             <Link to="/about" className="text-text-secondary hover:text-text-primary transition-colors flex items-center gap-1">
               <Info size={16} /> About
             </Link>
+            <Link to="/sources" className="text-text-secondary hover:text-text-primary transition-colors flex items-center gap-1">
+              <ShieldCheck size={16} /> Sources
+            </Link>
           </nav>
 
           <div className="flex items-center space-x-4">
@@ -53,6 +56,7 @@ const Layout = () => {
                 <li><Link to="/browse" className="hover:text-accent-gold transition-colors">Browse Politicians</Link></li>
                 <li><Link to="/rankings" className="hover:text-accent-gold transition-colors">National Rankings</Link></li>
                 <li><Link to="/compare" className="hover:text-accent-gold transition-colors">Compare Engine</Link></li>
+                <li><Link to="/sources" className="hover:text-accent-gold transition-colors">Verification Sources</Link></li>
               </ul>
             </div>
             <div>
@@ -102,6 +106,10 @@ const Layout = () => {
           <Link to="/rankings" className="flex flex-col items-center text-text-secondary hover:text-accent-gold">
             <BarChart3 size={20} />
             <span className="text-[10px] mt-1">Rank</span>
+          </Link>
+          <Link to="/sources" className="flex flex-col items-center text-text-secondary hover:text-accent-gold">
+            <ShieldCheck size={20} />
+            <span className="text-[10px] mt-1">Sources</span>
           </Link>
         </nav>
       </div>
