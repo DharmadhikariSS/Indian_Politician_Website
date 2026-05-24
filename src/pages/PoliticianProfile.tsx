@@ -1,0 +1,936 @@
+import React, { useState, useMemo } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { 
+  ResponsiveContainer, 
+  AreaChart, 
+  Area, 
+  XAxis, 
+  YAxis, 
+  Tooltip, 
+  CartesianGrid, 
+  BarChart, 
+  Bar, 
+  Legend, 
+  LineChart, 
+  Line,
+  Cell,
+  PieChart,
+  Pie
+} from 'recharts';
+import { 
+  ShieldCheck, 
+  Scale, 
+  TrendingUp, 
+  TrendingDown, 
+  Building2, 
+  AlertTriangle, 
+  Calendar, 
+  DollarSign, 
+  Award, 
+  FileText, 
+  CheckCircle2, 
+  ChevronLeft, 
+  User, 
+  Sparkles, 
+  Clock, 
+  Briefcase,
+  ExternalLink,
+  ChevronRight,
+  BookOpen,
+  Newspaper
+} from 'lucide-react';
+import { usePolitician } from '../hooks/usePoliticians';
+import type { DetailedPoliticianData } from '../data/politicians';
+import { IntegrityScoreGauge } from '../components/ui/IntegrityScoreGauge';
+import { Badge } from '../components/ui/Badge';
+import { Button } from '../components/ui/Button';
+import { Card, CardContent } from '../components/ui/Card';
+
+const PoliticianProfile = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<'overview' | 'financials' | 'criminal' | 'legislative' | 'press'>('overview');
+
+  // Find politician by ID using the usePolitician query hook!
+  const { data: politician, isLoading } = usePolitician(id);
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto p-4 py-20 text-center space-y-6 flex flex-col items-center justify-center min-h-[50vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent-gold"></div>
+        <h1 className="font-heading text-2xl font-bold text-text-secondary uppercase">RETRIEVING ACCOUNTABILITY PROFILE...</h1>
+      </div>
+    );
+  }
+
+  if (!politician) {
+    return (
+      <div className="container mx-auto p-4 py-20 text-center space-y-6">
+        <AlertTriangle size={64} className="text-danger-red mx-auto" />
+        <div className="space-y-2">
+          <h1 className="font-heading text-3xl font-bold">REPRESENTATIVE NOT FOUND</h1>
+          <p className="text-text-secondary text-sm max-w-md mx-auto">
+            The politician index for ID "{id}" could not be retrieved from the central database ledger.
+          </p>
+        </div>
+        <Link to="/browse">
+          <Button variant="outline" className="border-border-subtle hover:bg-bg-secondary text-accent-gold mt-4">
+            <ChevronLeft size={16} className="mr-1" /> Return to Decision Hub
+          </Button>
+        </Link>
+      </div>
+    );
+  }
+
+  // Segment colors for AI Score levels
+  const isSevereRisk = politician.aiScore <= 40;
+  const isCautionRisk = politician.aiScore > 40 && politician.aiScore <= 70;
+
+  // Custom tooltips for Recharts
+  const CustomFinancialTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-bg-secondary border border-border-subtle p-3 rounded-lg shadow-xl font-mono text-xs">
+          <p className="font-bold text-text-primary mb-1.5">YEAR: {label}</p>
+          {payload.map((entry: any, index: number) => (
+            <p key={index} style={{ color: entry.color }} className="flex justify-between gap-6 my-0.5">
+              <span>{entry.name.toUpperCase()}:</span>
+              <span className="font-bold">₹{entry.value.toFixed(2)} Cr</span>
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+
+  const CustomComparativeTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-bg-secondary border border-border-subtle p-3 rounded-lg shadow-xl font-mono text-xs">
+          <p className="font-bold text-text-primary mb-1.5">{label.toUpperCase()}</p>
+          {payload.map((entry: any, index: number) => (
+            <p key={index} style={{ color: entry.color }} className="flex justify-between gap-6 my-0.5">
+              <span>{entry.name.toUpperCase()}:</span>
+              <span className="font-bold">{entry.value}</span>
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+
+  // Corporate funding pie chart calculations
+  const pieData = politician.electoralBonds?.map((bond, index) => ({
+    name: bond.donor,
+    value: bond.amount,
+    color: index === 0 ? '#D4A017' : index === 1 ? '#ED8936' : index === 2 ? '#4299E1' : '#38A169'
+  })) || [];
+
+  const totalBondsAmount = politician.electoralBonds?.reduce((sum, b) => sum + b.amount, 0) || 0;
+
+  // Legislative comparative data for chart
+  const legislativeChartData = politician.parliamentActivity ? [
+    {
+      metric: 'Attendance %',
+      Representative: politician.parliamentActivity.attendance,
+      Average: politician.parliamentActivity.attendanceAvg,
+    },
+    {
+      metric: 'Debates led',
+      Representative: politician.parliamentActivity.debatesCount,
+      Average: politician.parliamentActivity.debatesAvg,
+    },
+    {
+      metric: 'Questions',
+      Representative: politician.parliamentActivity.questionsCount,
+      Average: politician.parliamentActivity.questionsAvg,
+    },
+    {
+      metric: 'Private Bills',
+      Representative: politician.parliamentActivity.privateMemberBills * 50, // Scaled for visual comparison
+      Average: politician.parliamentActivity.billsAvg * 50,
+      actualRepValue: politician.parliamentActivity.privateMemberBills,
+      actualAvgValue: politician.parliamentActivity.billsAvg,
+    }
+  ] : [];
+
+  return (
+    <div className="container mx-auto px-4 py-8 space-y-8 max-w-7xl">
+      
+      {/* Back to Browse breadcrumb */}
+      <div className="shrink-0 flex items-center justify-between">
+        <Link 
+          to="/browse" 
+          className="text-xs text-text-secondary hover:text-text-primary flex items-center font-mono"
+        >
+          <ChevronLeft size={14} className="mr-1" /> BACK TO DATA HUB
+        </Link>
+        <span className="text-[10px] font-mono text-text-secondary bg-bg-secondary border border-border-subtle px-2 py-0.5 rounded">
+          DATABASE STATUS: ACTIVE LEDGER
+        </span>
+      </div>
+
+      {/* 1. Header Profile Banner */}
+      <section className="bg-bg-secondary rounded-2xl border border-border-subtle overflow-hidden relative shadow-lg">
+        {/* Dynamic Warning Indicator Ribbon */}
+        <div className={`h-1.5 w-full ${
+          isSevereRisk ? 'bg-danger-red animate-pulse' : isCautionRisk ? 'bg-warning-amber' : 'bg-success-green'
+        }`} />
+
+        <div className="p-6 md:p-8 flex flex-col md:flex-row gap-6 md:gap-8 items-start md:items-center relative z-10">
+          {/* Portrait Photo */}
+          <div className="w-32 h-32 md:w-36 md:h-36 rounded-2xl overflow-hidden border border-border-subtle bg-bg-card shrink-0 relative shadow-inner">
+            <img 
+              src={politician.photoUrl} 
+              alt={politician.name} 
+              className="w-full h-full object-cover"
+            />
+            {politician.isVerified && (
+              <div className="absolute bottom-2 left-2 bg-info-blue text-white p-1 rounded-full shadow-md" title="Verified Profile">
+                <ShieldCheck size={16} />
+              </div>
+            )}
+          </div>
+
+          {/* Identity details */}
+          <div className="flex-1 space-y-3.5 min-w-0">
+            <div className="flex items-center gap-3.5 flex-wrap">
+              <span className="text-xs font-mono font-bold uppercase tracking-wider px-3 py-1 bg-bg-card border border-border-subtle rounded-full text-accent-gold shadow-sm">
+                Party: {politician.party}
+              </span>
+              <span className="text-xs font-mono text-text-secondary">
+                ID-CONSTITUENCY: {politician.constituency.toUpperCase()}
+              </span>
+            </div>
+
+            <h1 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-text-primary">
+              {politician.name}
+            </h1>
+
+            <div className="flex items-center gap-6 text-sm text-text-secondary font-sans flex-wrap">
+              <span className="flex items-center gap-1.5"><User size={16} className="text-accent-gold" /> {politician.role}</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-border-subtle"></span>
+              <span className="flex items-center gap-1.5"><Calendar size={16} className="text-accent-gold" /> Age: {politician.age}</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-border-subtle"></span>
+              <span className="flex items-center gap-1.5"><Briefcase size={16} className="text-accent-gold" /> Educ: {politician.education}</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-border-subtle"></span>
+              <span className="flex items-center gap-1.5 font-mono"><FileText size={16} className="text-accent-gold" /> PAN: {politician.panNumber}</span>
+            </div>
+
+            {/* Quick Warning Tags */}
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {politician.flags.edRaid && <Badge variant="outline" className="bg-bg-primary/50 text-warning-amber border-warning-amber/40"><AlertTriangle size={12} className="mr-1"/> Enforcement Directorate Raided</Badge>}
+              {politician.flags.convicted && <Badge variant="danger" className="border border-danger-red/40"><AlertTriangle size={12} className="mr-1"/> Convicted in Court</Badge>}
+              {politician.flags.offshoreLink && <Badge variant="outline" className="bg-bg-primary/50 text-info-blue border-info-blue/40">💰 Offshore Panama/BVI Assets Flag</Badge>}
+              {politician.flags.cronyism && <Badge variant="outline" className="bg-bg-primary/50 text-accent-gold border-accent-gold/40"><Building2 size={12} className="mr-1"/> Alleged Public Procurement Cronyism</Badge>}
+              {politician.flags.goodWork && <Badge variant="success" className="border border-success-green/40">✅ Exemplary Public Record Awarded</Badge>}
+            </div>
+          </div>
+
+          {/* Large Integrity Score Widget */}
+          <div className="bg-bg-card border border-border-subtle p-5 rounded-2xl flex flex-col items-center gap-2 shadow-md w-full md:w-44 shrink-0 text-center">
+            <IntegrityScoreGauge score={politician.aiScore} size="lg" showLabel={true} />
+            <div>
+              <p className="text-[10px] font-mono tracking-wider uppercase text-text-secondary font-bold">Integrity Score</p>
+              <p className={`text-xs font-mono font-bold uppercase mt-0.5 ${
+                isSevereRisk ? 'text-danger-red' : isCautionRisk ? 'text-warning-amber' : 'text-success-green'
+              }`}>
+                {politician.integrityDetails.riskLevel} RISK CLASSIFICATION
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 2. Navigation Tabs */}
+      <div className="flex border-b border-border-subtle overflow-x-auto whitespace-nowrap bg-bg-secondary/40 rounded-xl p-1 shrink-0">
+        <button
+          onClick={() => setActiveTab('overview')}
+          className={`flex items-center gap-2 px-5 py-3 text-xs md:text-sm uppercase font-mono font-bold tracking-wider rounded-lg transition-all ${
+            activeTab === 'overview' 
+              ? 'bg-bg-card border border-border-subtle text-accent-gold shadow-md' 
+              : 'text-text-secondary hover:text-text-primary'
+          }`}
+        >
+          <Sparkles size={16} /> AI Assessment & Overview
+        </button>
+        <button
+          onClick={() => setActiveTab('financials')}
+          className={`flex items-center gap-2 px-5 py-3 text-xs md:text-sm uppercase font-mono font-bold tracking-wider rounded-lg transition-all ${
+            activeTab === 'financials' 
+              ? 'bg-bg-card border border-border-subtle text-accent-gold shadow-md' 
+              : 'text-text-secondary hover:text-text-primary'
+          }`}
+        >
+          <TrendingUp size={16} /> Financial Audits ({politician.netWorth})
+        </button>
+        <button
+          onClick={() => setActiveTab('criminal')}
+          className={`flex items-center gap-2 px-5 py-3 text-xs md:text-sm uppercase font-mono font-bold tracking-wider rounded-lg transition-all ${
+            activeTab === 'criminal' 
+              ? 'bg-bg-card border border-border-subtle text-accent-gold shadow-md' 
+              : 'text-text-secondary hover:text-text-primary'
+          }`}
+        >
+          <Scale size={16} /> Criminal trials ({politician.criminalCases})
+        </button>
+        {politician.parliamentActivity && (
+          <button
+            onClick={() => setActiveTab('legislative')}
+            className={`flex items-center gap-2 px-5 py-3 text-xs md:text-sm uppercase font-mono font-bold tracking-wider rounded-lg transition-all ${
+              activeTab === 'legislative' 
+                ? 'bg-bg-card border border-border-subtle text-accent-gold shadow-md' 
+                : 'text-text-secondary hover:text-text-primary'
+            }`}
+          >
+            <BookOpen size={16} /> Legislative Telemetry ({politician.attendancePct}%)
+          </button>
+        )}
+        <button
+          onClick={() => setActiveTab('press')}
+          className={`flex items-center gap-2 px-5 py-3 text-xs md:text-sm uppercase font-mono font-bold tracking-wider rounded-lg transition-all ${
+            activeTab === 'press' 
+              ? 'bg-bg-card border border-border-subtle text-accent-gold shadow-md' 
+              : 'text-text-secondary hover:text-text-primary'
+          }`}
+        >
+          <Newspaper size={16} /> Press Scan & Audits ({politician.newsArticles?.length || 0})
+        </button>
+      </div>
+
+      {/* 3. Dynamic Tab Workspace Content */}
+      <div className="space-y-6">
+        
+        {/* ===================== TAB 1: OVERVIEW ===================== */}
+        {activeTab === 'overview' && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Col: Biography & General Stats */}
+            <div className="space-y-6 lg:col-span-1">
+              <Card className="border-border-subtle bg-bg-card">
+                <CardContent className="p-5 space-y-4">
+                  <h3 className="font-heading text-lg font-bold text-text-primary border-b border-border-subtle pb-2.5">
+                    BIOGRAPHICAL SNAPSHOT
+                  </h3>
+                  <p className="text-sm text-text-primary leading-relaxed">
+                    {politician.biography}
+                  </p>
+                  <div className="border-t border-border-subtle/50 pt-4 space-y-3.5 text-xs font-mono">
+                    <div className="flex justify-between">
+                      <span className="text-text-secondary uppercase">Active In Politics:</span>
+                      <span className="font-bold text-text-primary">Since {politician.activeSince}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-text-secondary uppercase">Electoral Terms:</span>
+                      <span className="font-bold text-text-primary">{politician.termCount} Terms Served</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-text-secondary uppercase">Legislative House:</span>
+                      <span className="font-bold text-text-primary">{politician.role}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-text-secondary uppercase">Registered State:</span>
+                      <span className="font-bold text-text-primary">{politician.state}</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Sub-Score Breakdown Gauge */}
+              <Card className="border-border-subtle bg-bg-card">
+                <CardContent className="p-5 space-y-4">
+                  <h3 className="font-heading text-lg font-bold text-text-primary border-b border-border-subtle pb-2.5">
+                    INTEGRITY BREAKDOWN INDEX
+                  </h3>
+                  
+                  {/* Financial Integrity Progress Bar */}
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between text-xs font-mono">
+                      <span className="text-text-secondary">FINANCIAL INTEGRITY</span>
+                      <span className={`font-bold ${politician.integrityDetails.financialIntegrity < 50 ? 'text-danger-red' : 'text-success-green'}`}>
+                        {politician.integrityDetails.financialIntegrity}/100
+                      </span>
+                    </div>
+                    <div className="w-full bg-bg-secondary rounded-full h-2">
+                      <div 
+                        className={`h-2 rounded-full ${politician.integrityDetails.financialIntegrity < 50 ? 'bg-danger-red' : 'bg-success-green'}`} 
+                        style={{ width: `${politician.integrityDetails.financialIntegrity}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Public Service Progress Bar */}
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between text-xs font-mono">
+                      <span className="text-text-secondary">PUBLIC SERVICE DELIV</span>
+                      <span className={`font-bold ${politician.integrityDetails.publicService < 50 ? 'text-danger-red' : 'text-success-green'}`}>
+                        {politician.integrityDetails.publicService}/100
+                      </span>
+                    </div>
+                    <div className="w-full bg-bg-secondary rounded-full h-2">
+                      <div 
+                        className={`h-2 rounded-full ${politician.integrityDetails.publicService < 50 ? 'bg-warning-amber' : 'bg-success-green'}`} 
+                        style={{ width: `${politician.integrityDetails.publicService}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Criminal History Progress Bar */}
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between text-xs font-mono">
+                      <span className="text-text-secondary">CLEAN CRIMINAL RECORD</span>
+                      <span className={`font-bold ${politician.integrityDetails.criminalHistory < 50 ? 'text-danger-red' : 'text-success-green'}`}>
+                        {politician.integrityDetails.criminalHistory}/100
+                      </span>
+                    </div>
+                    <div className="w-full bg-bg-secondary rounded-full h-2">
+                      <div 
+                        className={`h-2 rounded-full ${politician.integrityDetails.criminalHistory < 50 ? 'bg-danger-red' : 'bg-success-green'}`} 
+                        style={{ width: `${politician.integrityDetails.criminalHistory}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  <p className="text-[10px] text-text-secondary leading-relaxed font-sans pt-1 border-t border-border-subtle/50">
+                    Sub-scores derived using weightings from declared court proceedings (criminal), historical property transactions (financial), and local project allocations (service).
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Right Cols: Complete AI Report Assessment */}
+            <div className="lg:col-span-2 space-y-6">
+              <Card className="border-border-subtle bg-bg-card overflow-hidden">
+                {/* Tech banner */}
+                <div className="bg-bg-secondary border-b border-border-subtle p-4 flex items-center justify-between text-xs shrink-0">
+                  <div className="flex items-center gap-1.5 text-accent-gold font-mono font-bold">
+                    <Sparkles size={14} /> AI TRANSPARENCY DECISION AUDIT SUMMARY
+                  </div>
+                  <span className="text-[10px] text-text-secondary font-mono">
+                    MODEL SUMMARY STATUS: FINAL LEDGER
+                  </span>
+                </div>
+
+                <CardContent className="p-6 space-y-6">
+                  {/* Detailed summary paragraph */}
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-mono uppercase tracking-wider text-accent-gold font-bold">
+                      EXECUTIVE ASSESSMENT OUTLINE
+                    </h4>
+                    <p className="text-base text-text-primary leading-relaxed font-sans bg-bg-secondary/40 border border-border-subtle/50 rounded-xl p-4">
+                      {politician.integrityDetails.summary}
+                    </p>
+                  </div>
+
+                  {/* Red flags triggers */}
+                  {politician.integrityDetails.riskFactors.length > 0 && (
+                    <div className="space-y-3 pt-3 border-t border-border-subtle">
+                      <h4 className="text-xs font-mono uppercase tracking-wider text-danger-red font-bold flex items-center gap-1.5">
+                        <AlertTriangle size={14} className="text-danger-red animate-pulse" /> RED FLAG RISK TRIGGERS IDENTIFIED
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                        {politician.integrityDetails.riskFactors.map((risk, index) => (
+                          <div 
+                            key={index}
+                            className="bg-danger-red/5 border border-danger-red/15 rounded-xl p-3.5 text-xs text-text-primary leading-relaxed flex items-start gap-2.5"
+                          >
+                            <span className="text-danger-red text-base font-bold shrink-0 mt-[-3px]">!</span>
+                            <span className="font-sans font-medium text-text-secondary"><strong className="text-text-primary">Trigger {index+1}:</strong> {risk}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Positives contributions */}
+                  {politician.integrityDetails.positiveContributions.length > 0 && (
+                    <div className="space-y-3 pt-3 border-t border-border-subtle">
+                      <h4 className="text-xs font-mono uppercase tracking-wider text-success-green font-bold flex items-center gap-1.5">
+                        <CheckCircle2 size={14} className="text-success-green" /> KEY PUBLIC SERVICE CONTRIBUTIONS & HIGHLIGHTS
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                        {politician.integrityDetails.positiveContributions.map((pos, index) => (
+                          <div 
+                            key={index}
+                            className="bg-success-green/5 border border-success-green/15 rounded-xl p-3.5 text-xs text-text-primary leading-relaxed flex items-start gap-2.5 font-sans"
+                          >
+                            <span className="text-success-green text-base font-bold shrink-0 mt-[-3px]">✓</span>
+                            <span className="font-medium text-text-secondary"><strong className="text-text-primary">Contribution {index+1}:</strong> {pos}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
+
+        {/* ===================== TAB 2: FINANCIALS ===================== */}
+        {activeTab === 'financials' && (
+          <div className="space-y-6">
+            
+            {/* Financial Summary KPIs */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 font-mono text-center">
+              <div className="bg-bg-secondary border border-border-subtle p-4 rounded-xl shadow">
+                <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">CURRENT DECLARED NET WORTH</p>
+                <p className="text-2xl font-bold text-accent-gold mt-1.5">₹{politician.netWorth}</p>
+                <p className="text-[10px] text-text-secondary mt-1">Elections declaration cycle (latest)</p>
+              </div>
+              <div className="bg-bg-secondary border border-border-subtle p-4 rounded-xl shadow">
+                <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">RELATIVE ASSET GROWTH RATE</p>
+                <p className={`text-2xl font-bold mt-1.5 flex justify-center items-center gap-1 ${
+                  politician.netWorthGrowth > 100 ? 'text-danger-red' : 'text-success-green'
+                }`}>
+                  {politician.netWorthGrowth > 0 ? <TrendingUp size={22} /> : <TrendingDown size={22} />}
+                  {politician.netWorthGrowth}%
+                </p>
+                <p className="text-[10px] text-text-secondary mt-1">Comparison over preceding terms</p>
+              </div>
+              <div className="bg-bg-secondary border border-border-subtle p-4 rounded-xl shadow">
+                <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">DECLARED LIABILITIES RATIO</p>
+                <p className="text-2xl font-bold text-text-primary mt-1.5">
+                  ₹{politician.financialTimeline[politician.financialTimeline.length - 1].liabilities.toFixed(2)}Cr
+                </p>
+                <p className="text-[10px] text-text-secondary mt-1">Outstanding liabilities or debt</p>
+              </div>
+              <div className="bg-bg-secondary border border-border-subtle p-4 rounded-xl shadow">
+                <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">CORPORATE BOND SPONSORSHIP</p>
+                <p className="text-2xl font-bold text-info-blue mt-1.5">
+                  {totalBondsAmount > 0 ? `₹${totalBondsAmount.toFixed(1)}Cr` : '₹0.0Cr'}
+                </p>
+                <p className="text-[10px] text-text-secondary mt-1">Identified corporate donations</p>
+              </div>
+            </div>
+
+            {/* Asset Growth curves & corporate funding columns */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              
+              {/* Asset Curve Area Chart (2/3 width) */}
+              <div className="lg:col-span-2">
+                <Card className="border-border-subtle bg-bg-card h-full">
+                  <CardContent className="p-5 space-y-4">
+                    <h3 className="font-heading text-lg font-bold text-text-primary border-b border-border-subtle pb-2.5">
+                      HISTORICAL ASSETS DECLARATION CURVE (CRORES IN INR)
+                    </h3>
+                    
+                    <div className="h-80 w-full pt-4">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart
+                          data={politician.financialTimeline}
+                          margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                        >
+                          <defs>
+                            <linearGradient id="colorAssets" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#D4A017" stopOpacity={0.4}/>
+                              <stop offset="95%" stopColor="#D4A017" stopOpacity={0.0}/>
+                            </linearGradient>
+                            <linearGradient id="colorLiabs" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#E53E3E" stopOpacity={0.3}/>
+                              <stop offset="95%" stopColor="#E53E3E" stopOpacity={0.0}/>
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#30363D" vertical={false} />
+                          <XAxis dataKey="year" stroke="#8B949E" tickLine={false} style={{ fontSize: 10, fontFamily: 'Space Mono' }} />
+                          <YAxis stroke="#8B949E" tickLine={false} style={{ fontSize: 10, fontFamily: 'Space Mono' }} />
+                          <Tooltip content={<CustomFinancialTooltip />} />
+                          <Legend wrapperStyle={{ fontSize: 10, fontFamily: 'Space Mono', paddingTop: 10 }} />
+                          <Area 
+                            type="monotone" 
+                            name="Declared Assets" 
+                            dataKey="assets" 
+                            stroke="#D4A017" 
+                            strokeWidth={2}
+                            fillOpacity={1} 
+                            fill="url(#colorAssets)" 
+                          />
+                          <Area 
+                            type="monotone" 
+                            name="Declared Liabilities" 
+                            dataKey="liabilities" 
+                            stroke="#E53E3E" 
+                            strokeWidth={1.5}
+                            fillOpacity={1} 
+                            fill="url(#colorLiabs)" 
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Corporate Donors Breakdown (1/3 width) */}
+              <div className="lg:col-span-1">
+                <Card className="border-border-subtle bg-bg-card h-full">
+                  <CardContent className="p-5 space-y-4">
+                    <h3 className="font-heading text-lg font-bold text-text-primary border-b border-border-subtle pb-2.5">
+                      ELECTORAL FUNDING SPLIT
+                    </h3>
+                    
+                    {pieData.length > 0 ? (
+                      <div className="space-y-6">
+                        <div className="h-44 w-full relative flex items-center justify-center">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                              <Pie
+                                data={pieData}
+                                cx="50%"
+                                cy="50%"
+                                innerRadius={48}
+                                outerRadius={68}
+                                paddingAngle={3}
+                                dataKey="value"
+                              >
+                                {pieData.map((entry, index) => (
+                                  <Cell key={`cell-${index}`} fill={entry.color} />
+                                ))}
+                              </Pie>
+                              <Tooltip formatter={(value) => `₹${value} Cr`} />
+                            </PieChart>
+                          </ResponsiveContainer>
+                          {/* Inner sum label */}
+                          <div className="absolute text-center">
+                            <span className="text-[9px] uppercase tracking-wider text-text-secondary font-mono block">TOTAL BOND</span>
+                            <span className="font-mono text-base font-bold text-text-primary">₹{totalBondsAmount.toFixed(1)}Cr</span>
+                          </div>
+                        </div>
+
+                        {/* Custom legend list */}
+                        <div className="space-y-2 border-t border-border-subtle/50 pt-4 font-mono text-xs">
+                          {pieData.map((donor, idx) => (
+                            <div key={idx} className="flex justify-between items-center text-text-secondary">
+                              <span className="flex items-center gap-2 truncate">
+                                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: donor.color }} />
+                                {donor.name}
+                              </span>
+                              <span className="font-bold text-text-primary">₹{donor.value} Cr</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="h-64 flex flex-col items-center justify-center text-center p-4 space-y-2">
+                        <Building2 size={32} className="text-text-secondary/40" />
+                        <h4 className="font-heading text-sm font-bold text-text-secondary">NO DONOR DISCLOSURES FOUND</h4>
+                        <p className="text-[10px] text-text-secondary max-w-xs leading-relaxed font-sans">
+                          No corporate entities or electoral trust bonds have been linked to this independent or municipal candidate.
+                        </p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+
+            </div>
+
+            {/* Income Streams declared list */}
+            <Card className="border-border-subtle bg-bg-card">
+              <CardContent className="p-5 space-y-4">
+                <h3 className="font-heading text-lg font-bold text-text-primary border-b border-border-subtle pb-2.5">
+                  DECLARED ASSET SOURCES & HOLDING DESCRIPTIONS
+                </h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {politician.financialTimeline.map((item, idx) => (
+                    <div key={idx} className="bg-bg-secondary/40 border border-border-subtle rounded-xl p-4 space-y-2">
+                      <div className="flex justify-between items-center border-b border-border-subtle/60 pb-2">
+                        <span className="font-mono text-sm font-bold text-accent-gold">YEAR {item.year}</span>
+                        <Badge variant="outline" className="text-[10px] font-mono border-border-subtle">₹{item.assets} Cr</Badge>
+                      </div>
+                      <ul className="space-y-1.5 pt-1.5">
+                        {item.sources.map((source, sIdx) => (
+                          <li key={sIdx} className="text-xs text-text-secondary flex items-start gap-1.5 font-sans leading-relaxed">
+                            <span className="text-accent-gold shrink-0">•</span>
+                            {source}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+          </div>
+        )}
+
+        {/* ===================== TAB 3: CRIMINAL TRIALS ===================== */}
+        {activeTab === 'criminal' && (
+          <div className="space-y-6">
+            
+            {/* Trial KPI Header */}
+            <div className="bg-danger-red/5 border border-danger-red/15 rounded-xl p-5 flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-4 text-center md:text-left">
+                <div className="bg-danger-red/10 p-3 rounded-full shrink-0 border border-danger-red/20 hidden sm:block">
+                  <Scale size={28} className="text-danger-red" />
+                </div>
+                <div>
+                  <h3 className="font-heading text-lg font-bold text-text-primary uppercase tracking-wide">
+                    CRIMINAL TRIAL RADAR DISCLOSURE
+                  </h3>
+                  <p className="text-xs text-text-secondary leading-relaxed font-sans max-w-xl mt-1">
+                    Indexed FIR court cases declared by candidate under ECI statutory provisions. Status verification confirms active proceedings.
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-bg-secondary/70 border border-border-subtle px-6 py-3 rounded-xl font-mono text-center shadow shrink-0">
+                <span className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">ACTIVE CHARGE SHEETS</span>
+                <p className="text-3xl font-bold text-danger-red mt-0.5">{politician.criminalCases} Cases</p>
+              </div>
+            </div>
+
+            {/* Complete listing of criminal FIR cases */}
+            {politician.criminalCaseList.length > 0 ? (
+              <div className="space-y-4">
+                {politician.criminalCaseList.map((trial, index) => (
+                  <Card key={index} className="border-border-subtle bg-bg-card hover:border-danger-red/35 transition-colors overflow-hidden">
+                    {/* Top Case ID row */}
+                    <div className="bg-bg-secondary p-4 flex justify-between items-center border-b border-border-subtle/50 text-xs font-mono">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-bold text-text-primary text-sm flex items-center gap-1.5">
+                          <AlertTriangle size={14} className="text-danger-red" /> {trial.caseNumber}
+                        </span>
+                        <span className="text-text-secondary">| Filed on {trial.date}</span>
+                      </div>
+                      <Badge variant={trial.status.includes('Convicted') ? 'danger' : 'outline'} className="border-border-subtle font-bold">
+                        {trial.status.toUpperCase()}
+                      </Badge>
+                    </div>
+
+                    <CardContent className="p-5 grid grid-cols-1 md:grid-cols-3 gap-6 font-sans">
+                      {/* Allegations & Charges Column */}
+                      <div className="md:col-span-1 space-y-2">
+                        <h4 className="text-xs font-mono uppercase tracking-wider text-danger-red font-bold">DECLARED ALLEGATIONS</h4>
+                        <ul className="space-y-1.5">
+                          {trial.charges.map((charge, cIdx) => (
+                            <li key={cIdx} className="text-xs text-text-primary leading-relaxed flex items-start gap-1.5">
+                              <span className="text-danger-red shrink-0">•</span>
+                              {charge}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Legislative IPC Sections Column */}
+                      <div className="md:col-span-1 space-y-2">
+                        <h4 className="text-xs font-mono uppercase tracking-wider text-accent-gold font-bold">IPC SECTIONS LINKED</h4>
+                        <div className="flex flex-wrap gap-1.5 pt-0.5">
+                          {trial.sections.map((section, sIdx) => (
+                            <Badge key={sIdx} variant="outline" className="bg-bg-primary/40 border-border-subtle text-text-primary font-mono text-[10px]">
+                              {section}
+                            </Badge>
+                          ))}
+                        </div>
+                        <p className="text-[10px] text-text-secondary leading-relaxed pt-1.5">
+                          Indian Penal Code (IPC) or custom Prevention of Corruption Act categories registered in magistrate files.
+                        </p>
+                      </div>
+
+                      {/* Judicial Authority Column */}
+                      <div className="md:col-span-1 space-y-2 font-mono text-xs text-text-secondary">
+                        <h4 className="text-xs font-mono uppercase tracking-wider text-text-secondary font-bold">JUDICIAL VENUE</h4>
+                        <div className="space-y-1.5 pt-1.5">
+                          <p>COURT: <strong className="text-text-primary">{trial.court}</strong></p>
+                          <p>STAGE: <strong className="text-text-primary">{trial.status}</strong></p>
+                          <p>CASE RECORD: <strong className="text-text-primary">VERIFIED LEDGER</strong></p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="bg-bg-secondary border border-border-subtle rounded-2xl p-16 text-center space-y-3.5">
+                <CheckCircle2 size={48} className="text-success-green mx-auto animate-bounce" />
+                <div>
+                  <h3 className="font-heading text-xl font-bold text-text-primary uppercase tracking-wide">
+                    PRISTINE INTEGRITY • ZERO CHARGES DECLARED
+                  </h3>
+                  <p className="text-sm text-text-secondary max-w-sm mx-auto leading-relaxed font-sans">
+                    No active FIRs or criminal indictments have been registered against this candidate in any judicial court in India.
+                  </p>
+                </div>
+              </div>
+            )}
+
+          </div>
+        )}
+
+        {/* ===================== TAB 4: LEGISLATIVE ===================== */}
+        {activeTab === 'legislative' && politician.parliamentActivity && (
+          <div className="space-y-6">
+            
+            {/* Legislative comparative KPIs */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 font-mono text-center">
+              <div className="bg-bg-secondary border border-border-subtle p-4 rounded-xl shadow">
+                <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">REPRESENTATIVE ATTENDANCE</p>
+                <p className="text-2xl font-bold text-info-blue mt-1.5">{politician.parliamentActivity.attendance}%</p>
+                <p className="text-[10px] text-text-secondary mt-1">Regional Average: {politician.parliamentActivity.attendanceAvg}%</p>
+              </div>
+              <div className="bg-bg-secondary border border-border-subtle p-4 rounded-xl shadow">
+                <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">DEBATES PARTICIPATION</p>
+                <p className="text-2xl font-bold text-text-primary mt-1.5">{politician.parliamentActivity.debatesCount}</p>
+                <p className="text-[10px] text-text-secondary mt-1">Regional Average: {politician.parliamentActivity.debatesAvg}</p>
+              </div>
+              <div className="bg-bg-secondary border border-border-subtle p-4 rounded-xl shadow">
+                <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">QUESTIONS SUBMITTED</p>
+                <p className="text-2xl font-bold text-text-primary mt-1.5">{politician.parliamentActivity.questionsCount}</p>
+                <p className="text-[10px] text-text-secondary mt-1">Regional Average: {politician.parliamentActivity.questionsAvg}</p>
+              </div>
+              <div className="bg-bg-secondary border border-border-subtle p-4 rounded-xl shadow">
+                <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">PRIVATE MEMBER BILLS</p>
+                <p className="text-2xl font-bold text-text-primary mt-1.5">{politician.parliamentActivity.privateMemberBills}</p>
+                <p className="text-[10px] text-text-secondary mt-1">Regional Average: {politician.parliamentActivity.billsAvg}</p>
+              </div>
+            </div>
+
+            {/* Performance charts compared to Average */}
+            <Card className="border-border-subtle bg-bg-card">
+              <CardContent className="p-5 space-y-4">
+                <h3 className="font-heading text-lg font-bold text-text-primary border-b border-border-subtle pb-2.5">
+                  LEGISLATIVE ACTIVITY TELEMETRY VS ASSEMBLY AVERAGES
+                </h3>
+                
+                <div className="h-96 w-full pt-4">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={legislativeChartData}
+                      margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" stroke="#30363D" vertical={false} />
+                      <XAxis dataKey="metric" stroke="#8B949E" tickLine={false} style={{ fontSize: 10, fontFamily: 'Space Mono' }} />
+                      <YAxis stroke="#8B949E" tickLine={false} style={{ fontSize: 10, fontFamily: 'Space Mono' }} />
+                      <Tooltip content={<CustomComparativeTooltip />} />
+                      <Legend wrapperStyle={{ fontSize: 10, fontFamily: 'Space Mono', paddingTop: 10 }} />
+                      <Bar 
+                        name="This Representative" 
+                        dataKey="Representative" 
+                        fill="#4299E1" 
+                        radius={[4, 4, 0, 0]} 
+                      />
+                      <Bar 
+                        name="Legislative Average" 
+                        dataKey="Average" 
+                        fill="#1C2128" 
+                        stroke="#30363D"
+                        strokeWidth={1.5}
+                        radius={[4, 4, 0, 0]} 
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+
+                <p className="text-[10px] text-text-secondary leading-relaxed font-sans pt-1 border-t border-border-subtle/50 text-center">
+                  * Note: "Private Bills" are scaled by x50 on the comparative chart to maintain clear visual proportions against high attendance percentages.
+                </p>
+              </CardContent>
+            </Card>
+
+          </div>
+        )}
+
+        {/* ===================== TAB 5: PRESS SCAN ===================== */}
+        {activeTab === 'press' && (
+          <div className="space-y-6">
+            {/* Press KPI Info Bar */}
+            <div className="bg-bg-secondary border border-border-subtle rounded-xl p-5 flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-4 text-center md:text-left">
+                <div className="bg-accent-gold/10 p-3 rounded-full shrink-0 border border-accent-gold/20 hidden sm:block">
+                  <Newspaper size={28} className="text-accent-gold" />
+                </div>
+                <div>
+                  <h3 className="font-heading text-lg font-bold text-text-primary uppercase tracking-wide">
+                    MEDIA PRESS SCAN & SENTIMENT AUDIT
+                  </h3>
+                  <p className="text-xs text-text-secondary leading-relaxed font-sans max-w-xl mt-1">
+                    Live scan tracking of verified press coverage, investigative journalism reports, and official policy disclosures regarding this representative.
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-bg-secondary/70 border border-border-subtle px-6 py-3 rounded-xl font-mono text-center shadow shrink-0">
+                <span className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">TOTAL SCANNED REPORTS</span>
+                <p className="text-3xl font-bold text-accent-gold mt-0.5">{politician.newsArticles?.length || 0} Articles</p>
+              </div>
+            </div>
+
+            {/* Articles feed list */}
+            {politician.newsArticles && politician.newsArticles.length > 0 ? (
+              <div className="space-y-4">
+                {politician.newsArticles.map((article) => (
+                  <Card key={article.id} className="border-border-subtle bg-bg-card hover:border-accent-gold/35 transition-colors overflow-hidden">
+                    <div className="p-5 space-y-3.5">
+                      <div className="flex justify-between items-start gap-4 flex-wrap">
+                        <div className="space-y-1">
+                          <span className="font-mono text-[10px] text-text-secondary uppercase">
+                            PUBLISHED BY <strong className="text-text-primary">{article.publisher}</strong> • {article.date}
+                          </span>
+                          <h4 className="font-heading text-lg font-bold text-text-primary group-hover:text-accent-gold transition-colors">
+                            {article.title}
+                          </h4>
+                        </div>
+
+                        {/* Badges */}
+                        <div className="flex gap-2">
+                          <Badge variant="outline" className="text-[10px] font-mono border-border-subtle/80 text-text-primary uppercase bg-bg-secondary">
+                            {article.category}
+                          </Badge>
+                          <Badge 
+                            variant={
+                              article.sentiment === 'CRITICAL_ALLEGATION' ? 'danger' :
+                              article.sentiment === 'POSITIVE_OUTCOME' ? 'success' : 'outline'
+                            }
+                            className="text-[10px] font-mono uppercase"
+                          >
+                            {article.sentiment.replace('_', ' ')}
+                          </Badge>
+                        </div>
+                      </div>
+
+                      <p className="text-xs text-text-secondary leading-relaxed font-sans">
+                        {article.summary}
+                      </p>
+
+                      <div className="flex justify-between items-center border-t border-border-subtle/30 pt-3.5 mt-2">
+                        <span className="text-[10px] font-mono text-text-secondary uppercase">
+                          AUDIT CLASSIFICATION: VERIFIED SCAN
+                        </span>
+                        
+                        <a 
+                          href={article.url} 
+                          className="text-[10px] font-mono font-bold text-accent-gold hover:text-text-primary flex items-center gap-1"
+                        >
+                          OPEN PRESS REPORT <ExternalLink size={10} />
+                        </a>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="bg-bg-secondary border border-border-subtle rounded-2xl p-16 text-center space-y-3.5">
+                <Newspaper size={48} className="text-text-secondary/40 mx-auto" />
+                <div>
+                  <h3 className="font-heading text-xl font-bold text-text-secondary uppercase tracking-wide">
+                    NO DIRECT PRESS SCANS LOGGED
+                  </h3>
+                  <p className="text-sm text-text-secondary max-w-sm mx-auto leading-relaxed font-sans">
+                    No verified investigative media publications or press scanner releases are currently indexed under this representative's file.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+      </div>
+
+    </div>
+  );
+};
+
+export default PoliticianProfile;

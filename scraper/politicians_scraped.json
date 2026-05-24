@@ -1,0 +1,389 @@
+[
+  {
+    "name": "Chandra Shekhar",
+    "party": "IND",
+    "state": "India",
+    "constituency": "Unknown Constituency",
+    "role": "MLA",
+    "age": 50,
+    "gender": "Male",
+    "education": "Graduate",
+    "panNumber": "N/A",
+    "activeSince": 2015,
+    "netWorth": "0Cr",
+    "netWorthGrowth": 15,
+    "financialTimeline": [
+      {
+        "year": 2014,
+        "assets": 0.0,
+        "liabilities": 0.0,
+        "sources": [
+          "Agricultural Earnings"
+        ]
+      },
+      {
+        "year": 2019,
+        "assets": 0.0,
+        "liabilities": 0.0,
+        "sources": [
+          "Business Investments",
+          "Rentals"
+        ]
+      },
+      {
+        "year": 2024,
+        "assets": 0.0,
+        "liabilities": 0.0,
+        "sources": [
+          "Equities",
+          "Commercial Complex Partnerships"
+        ]
+      }
+    ],
+    "criminalCases": 0,
+    "criminalCaseList": [],
+    "photoUrl": "https://placehold.co/400x400/1C2128/E6EDF3?text=Chandra+Shekhar",
+    "isVerified": true,
+    "flags": {},
+    "attendancePct": 58,
+    "parliamentActivity": {
+      "attendance": 58,
+      "debatesCount": 109,
+      "questionsCount": 84,
+      "privateMemberBills": 0,
+      "attendanceAvg": 76,
+      "debatesAvg": 22,
+      "questionsAvg": 95,
+      "billsAvg": 0.8
+    },
+    "electoralBonds": [],
+    "aiScore": 85,
+    "integrityDetails": {
+      "financialIntegrity": 95,
+      "publicService": 62,
+      "criminalHistory": 100,
+      "riskLevel": "LOW",
+      "summary": "Chandra Shekhar is a MLA representing the Unknown Constituency constituency in India from the IND party. Standard checks identify Chandra Shekhar as a low-risk public representative with a pristine integrity rating of 85/100. They present clean financial declarations and exemplary governance devotion indices.",
+      "riskFactors": [
+        "Low legislative session attendance record (58%)"
+      ],
+      "positiveContributions": [
+        "Pristine / clean criminal record with zero active cases"
+      ]
+    },
+    "id": "scraped-1"
+  },
+  {
+    "name": "Devendra Fadnavis",
+    "party": "IND",
+    "state": "India",
+    "constituency": "Unknown Constituency",
+    "role": "Leader of Opposition",
+    "age": 50,
+    "gender": "Male",
+    "education": "Graduate",
+    "panNumber": "08876345",
+    "activeSince": 2015,
+    "netWorth": "0Cr",
+    "netWorthGrowth": 15,
+    "financialTimeline": [
+      {
+        "year": 2014,
+        "assets": 0.0,
+        "liabilities": 0.0,
+        "sources": [
+          "Agricultural Earnings"
+        ]
+      },
+      {
+        "year": 2019,
+        "assets": 0.0,
+        "liabilities": 0.0,
+        "sources": [
+          "Business Investments",
+          "Rentals"
+        ]
+      },
+      {
+        "year": 2024,
+        "assets": 0.0,
+        "liabilities": 0.0,
+        "sources": [
+          "Equities",
+          "Commercial Complex Partnerships"
+        ]
+      }
+    ],
+    "criminalCases": 0,
+    "criminalCaseList": [],
+    "photoUrl": "https://placehold.co/400x400/1C2128/E6EDF3?text=Devendra+Fadnavis",
+    "isVerified": true,
+    "flags": {
+      "offshoreLink": true,
+      "cronyism": true
+    },
+    "attendancePct": 90,
+    "parliamentActivity": {
+      "attendance": 90,
+      "debatesCount": 115,
+      "questionsCount": 199,
+      "privateMemberBills": 2,
+      "attendanceAvg": 76,
+      "debatesAvg": 22,
+      "questionsAvg": 95,
+      "billsAvg": 0.8
+    },
+    "electoralBonds": [],
+    "aiScore": 65,
+    "integrityDetails": {
+      "financialIntegrity": 75,
+      "publicService": 91,
+      "criminalHistory": 100,
+      "riskLevel": "MEDIUM",
+      "summary": "Devendra Fadnavis is a Leader of Opposition representing the Unknown Constituency constituency in India from the IND party. Baseline telemetries flag Devendra Fadnavis under moderate risk classification (65/100) due to moderate asset shifts or minor protest-related FIRs, though they maintain a clean profile elsewhere.",
+      "riskFactors": [
+        "Named in international leaks regarding beneficial ownership of offshore shell companies",
+        "Administrative cronyism flags in local/state contract allocations"
+      ],
+      "positiveContributions": [
+        "Pristine / clean criminal record with zero active cases"
+      ]
+    },
+    "id": "scraped-2"
+  },
+  {
+    "name": "D.K. Shivakumar",
+    "party": "IND",
+    "state": "India",
+    "constituency": "Unknown Constituency",
+    "role": "Deputy Chief Minister",
+    "age": 50,
+    "gender": "Male",
+    "education": "Graduate",
+    "panNumber": "08876345",
+    "activeSince": 2015,
+    "netWorth": "0Cr",
+    "netWorthGrowth": 15,
+    "financialTimeline": [
+      {
+        "year": 2014,
+        "assets": 0.0,
+        "liabilities": 0.0,
+        "sources": [
+          "Agricultural Earnings"
+        ]
+      },
+      {
+        "year": 2019,
+        "assets": 0.0,
+        "liabilities": 0.0,
+        "sources": [
+          "Business Investments",
+          "Rentals"
+        ]
+      },
+      {
+        "year": 2024,
+        "assets": 0.0,
+        "liabilities": 0.0,
+        "sources": [
+          "Equities",
+          "Commercial Complex Partnerships"
+        ]
+      }
+    ],
+    "criminalCases": 0,
+    "criminalCaseList": [],
+    "photoUrl": "https://placehold.co/400x400/1C2128/E6EDF3?text=D.K.+Shivakumar",
+    "isVerified": true,
+    "flags": {
+      "offshoreLink": true,
+      "cronyism": true
+    },
+    "attendancePct": 90,
+    "parliamentActivity": {
+      "attendance": 90,
+      "debatesCount": 115,
+      "questionsCount": 199,
+      "privateMemberBills": 2,
+      "attendanceAvg": 76,
+      "debatesAvg": 22,
+      "questionsAvg": 95,
+      "billsAvg": 0.8
+    },
+    "electoralBonds": [],
+    "aiScore": 65,
+    "integrityDetails": {
+      "financialIntegrity": 75,
+      "publicService": 91,
+      "criminalHistory": 100,
+      "riskLevel": "MEDIUM",
+      "summary": "D.K. Shivakumar is a Deputy Chief Minister representing the Unknown Constituency constituency in India from the IND party. Baseline telemetries flag D.K. Shivakumar under moderate risk classification (65/100) due to moderate asset shifts or minor protest-related FIRs, though they maintain a clean profile elsewhere.",
+      "riskFactors": [
+        "Named in international leaks regarding beneficial ownership of offshore shell companies",
+        "Administrative cronyism flags in local/state contract allocations"
+      ],
+      "positiveContributions": [
+        "Pristine / clean criminal record with zero active cases"
+      ]
+    },
+    "id": "scraped-3"
+  },
+  {
+    "name": "Arvind Kejriwal",
+    "party": "IND",
+    "state": "India",
+    "constituency": "Unknown Constituency",
+    "role": "MLA",
+    "age": 50,
+    "gender": "Male",
+    "education": "Graduate",
+    "panNumber": "08876345",
+    "activeSince": 2015,
+    "netWorth": "0Cr",
+    "netWorthGrowth": 15,
+    "financialTimeline": [
+      {
+        "year": 2014,
+        "assets": 0.0,
+        "liabilities": 0.0,
+        "sources": [
+          "Agricultural Earnings"
+        ]
+      },
+      {
+        "year": 2019,
+        "assets": 0.0,
+        "liabilities": 0.0,
+        "sources": [
+          "Business Investments",
+          "Rentals"
+        ]
+      },
+      {
+        "year": 2024,
+        "assets": 0.0,
+        "liabilities": 0.0,
+        "sources": [
+          "Equities",
+          "Commercial Complex Partnerships"
+        ]
+      }
+    ],
+    "criminalCases": 0,
+    "criminalCaseList": [],
+    "photoUrl": "https://placehold.co/400x400/1C2128/E6EDF3?text=Arvind+Kejriwal",
+    "isVerified": true,
+    "flags": {
+      "offshoreLink": true,
+      "cronyism": true
+    },
+    "attendancePct": 90,
+    "parliamentActivity": {
+      "attendance": 90,
+      "debatesCount": 115,
+      "questionsCount": 199,
+      "privateMemberBills": 2,
+      "attendanceAvg": 76,
+      "debatesAvg": 22,
+      "questionsAvg": 95,
+      "billsAvg": 0.8
+    },
+    "electoralBonds": [],
+    "aiScore": 65,
+    "integrityDetails": {
+      "financialIntegrity": 75,
+      "publicService": 91,
+      "criminalHistory": 100,
+      "riskLevel": "MEDIUM",
+      "summary": "Arvind Kejriwal is a MLA representing the Unknown Constituency constituency in India from the IND party. Baseline telemetries flag Arvind Kejriwal under moderate risk classification (65/100) due to moderate asset shifts or minor protest-related FIRs, though they maintain a clean profile elsewhere.",
+      "riskFactors": [
+        "Named in international leaks regarding beneficial ownership of offshore shell companies",
+        "Administrative cronyism flags in local/state contract allocations"
+      ],
+      "positiveContributions": [
+        "Outstanding legislative session attendance record (90%)",
+        "Pristine / clean criminal record with zero active cases"
+      ]
+    },
+    "id": "scraped-4"
+  },
+  {
+    "name": "M.K. Stalin",
+    "party": "IND",
+    "state": "India",
+    "constituency": "Unknown Constituency",
+    "role": "Chief Minister",
+    "age": 50,
+    "gender": "Male",
+    "education": "Graduate",
+    "panNumber": "02823475",
+    "activeSince": 2015,
+    "netWorth": "0Cr",
+    "netWorthGrowth": 15,
+    "financialTimeline": [
+      {
+        "year": 2014,
+        "assets": 0.0,
+        "liabilities": 0.0,
+        "sources": [
+          "Agricultural Earnings"
+        ]
+      },
+      {
+        "year": 2019,
+        "assets": 0.0,
+        "liabilities": 0.0,
+        "sources": [
+          "Business Investments",
+          "Rentals"
+        ]
+      },
+      {
+        "year": 2024,
+        "assets": 0.0,
+        "liabilities": 0.0,
+        "sources": [
+          "Equities",
+          "Commercial Complex Partnerships"
+        ]
+      }
+    ],
+    "criminalCases": 0,
+    "criminalCaseList": [],
+    "photoUrl": "https://placehold.co/400x400/1C2128/E6EDF3?text=M.K.+Stalin",
+    "isVerified": true,
+    "flags": {
+      "offshoreLink": true,
+      "cronyism": true
+    },
+    "attendancePct": 43,
+    "parliamentActivity": {
+      "attendance": 43,
+      "debatesCount": 100,
+      "questionsCount": 189,
+      "privateMemberBills": 3,
+      "attendanceAvg": 76,
+      "debatesAvg": 22,
+      "questionsAvg": 95,
+      "billsAvg": 0.8
+    },
+    "electoralBonds": [],
+    "aiScore": 65,
+    "integrityDetails": {
+      "financialIntegrity": 75,
+      "publicService": 48,
+      "criminalHistory": 100,
+      "riskLevel": "MEDIUM",
+      "summary": "M.K. Stalin is a Chief Minister representing the Unknown Constituency constituency in India from the IND party. Baseline telemetries flag M.K. Stalin under moderate risk classification (65/100) due to moderate asset shifts or minor protest-related FIRs, though they maintain a clean profile elsewhere.",
+      "riskFactors": [
+        "Named in international leaks regarding beneficial ownership of offshore shell companies",
+        "Administrative cronyism flags in local/state contract allocations"
+      ],
+      "positiveContributions": [
+        "Pristine / clean criminal record with zero active cases"
+      ]
+    },
+    "id": "scraped-5"
+  }
+]

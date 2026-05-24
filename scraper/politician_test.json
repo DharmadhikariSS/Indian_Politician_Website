@@ -1,0 +1,75 @@
+[
+  {
+    "name": "Lok Sabha 2024",
+    "party": "IND",
+    "state": "India",
+    "constituency": "Unknown Constituency",
+    "role": "MLA",
+    "age": 50,
+    "gender": "Male",
+    "education": "Graduate",
+    "panNumber": "N/A",
+    "activeSince": 2015,
+    "netWorth": "0Cr",
+    "netWorthGrowth": 15,
+    "financialTimeline": [
+      {
+        "year": 2014,
+        "assets": 0.0,
+        "liabilities": 0.0,
+        "sources": [
+          "Agricultural Earnings"
+        ]
+      },
+      {
+        "year": 2019,
+        "assets": 0.0,
+        "liabilities": 0.0,
+        "sources": [
+          "Business Investments",
+          "Rentals"
+        ]
+      },
+      {
+        "year": 2024,
+        "assets": 0.0,
+        "liabilities": 0.0,
+        "sources": [
+          "Equities",
+          "Commercial Complex Partnerships"
+        ]
+      }
+    ],
+    "criminalCases": 0,
+    "criminalCaseList": [],
+    "photoUrl": "https://placehold.co/400x400/1C2128/E6EDF3?text=Lok+Sabha+2024",
+    "isVerified": true,
+    "flags": {},
+    "attendancePct": 40,
+    "parliamentActivity": {
+      "attendance": 40,
+      "debatesCount": 113,
+      "questionsCount": 344,
+      "privateMemberBills": 3,
+      "attendanceAvg": 76,
+      "debatesAvg": 22,
+      "questionsAvg": 95,
+      "billsAvg": 0.8
+    },
+    "electoralBonds": [],
+    "aiScore": 85,
+    "integrityDetails": {
+      "financialIntegrity": 95,
+      "publicService": 46,
+      "criminalHistory": 100,
+      "riskLevel": "LOW",
+      "summary": "Lok Sabha 2024 is a MLA representing the Unknown Constituency constituency in India from the IND party. Standard checks identify Lok Sabha 2024 as a low-risk public representative with a pristine integrity rating of 85/100. They present clean financial declarations and exemplary governance devotion indices.",
+      "riskFactors": [
+        "Low legislative session attendance record (40%)"
+      ],
+      "positiveContributions": [
+        "Pristine / clean criminal record with zero active cases"
+      ]
+    }
+  }
+]

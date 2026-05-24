@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg-primary: #0D1117;
+  --color-bg-secondary: #161B22;
+  --color-bg-card: #1C2128;
+  --color-accent-gold: #D4A017;
+  --color-danger-red: #E53E3E;
+  --color-warning-amber: #ED8936;
+  --color-success-green: #38A169;
+  --color-info-blue: #4299E1;
+  --color-text-primary: #E6EDF3;
+  --color-text-secondary: #8B949E;
+  --color-border-subtle: #30363D;
+
+  --font-sans: "IBM Plex Sans", sans-serif;
+  --font-mono: "Space Mono", monospace;
+  --font-heading: "Oswald", sans-serif;
+
+  --animate-marquee: marquee 25s linear infinite;
+
+  @keyframes marquee {
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(-50%); }
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-bg-primary text-text-primary font-sans antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading tracking-tight;
+  }
+}
