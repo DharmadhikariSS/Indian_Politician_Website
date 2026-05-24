@@ -1299,7 +1299,27 @@ export const mockPoliticians: DetailedPoliticianData[] = [
         "summary": "Prime Minister Modi unveiled a ₹10,000 crore national AI computing initiative to deploy regional tech incubators and support native language startup models. [Source: Press Information Bureau]",
         "url": "https://en.wikipedia.org/wiki/Narendra_Modi"
       }
-    ]
+    ],
+    "pincodes": ["221001"],
+    "strongestOpponentId": "9",
+    "constituencyRivalry": {
+      "opponentName": "Devendra Gandhi",
+      "marginPercent": 15.2,
+      "historicalMarginText": "1,52,500 votes margin in 2024 Varanasi Lok Sabha elections"
+    },
+    "agendaExecutionRate": 78,
+    "manifestoSectorBreakdown": [
+      { "sector": "Infrastructure", "value": 40 },
+      { "sector": "Welfare Schemes", "value": 30 },
+      { "sector": "Tech & Startup", "value": 20 },
+      { "sector": "Healthcare", "value": 10 }
+    ],
+    "manifestoPledges": [
+      { "category": "Infrastructure", "pledge": "Build Varanasi Ring Road Phase 2", "status": "Fulfilled" },
+      { "category": "Tech & Startup", "pledge": "Deploy National AI Computing Mission", "status": "Progress" }
+    ],
+    "localWardFundUtilization": 88,
+    "grievanceRedressPct": 84
   },
   {
     "id": "scraped-2",
