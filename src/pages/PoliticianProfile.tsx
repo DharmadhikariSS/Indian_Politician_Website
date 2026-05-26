@@ -808,6 +808,42 @@ const PoliticianProfile = () => {
                     </CardContent>
                   </Card>
                 ))}
+                
+                {politician.criminalCases > politician.criminalCaseList.length && (
+                  <div className="bg-bg-secondary/40 border border-border-subtle rounded-xl p-5 md:p-6 space-y-3 font-sans text-xs">
+                    <div className="flex gap-4 items-start">
+                      <div className="p-2.5 bg-warning-amber/10 border border-warning-amber/20 text-warning-amber rounded-lg shrink-0">
+                        <AlertTriangle size={18} />
+                      </div>
+                      <div className="space-y-2">
+                        <h4 className="font-mono text-sm font-bold text-text-primary uppercase tracking-wider">
+                          Magistrate Filings Audit Notice
+                        </h4>
+                        <p className="text-text-secondary leading-relaxed">
+                          This candidate has declared a total of <strong>{politician.criminalCases} pending criminal cases</strong> in their official nomination filings with the Election Commission of India (ECI). The <strong>{politician.criminalCaseList.length}</strong> cases listed above detail the most severe active indictments or high-profile charge sheets. The remaining <strong>{politician.criminalCases - politician.criminalCaseList.length}</strong> cases primarily represent protest-related assembly charges (e.g. IPC Section 143/188), political marches, and minor localized municipal ordinance filings.
+                        </p>
+                        <div className="flex flex-wrap gap-3 pt-2">
+                          <a 
+                            href={`https://myneta.info/`} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-bg-secondary hover:bg-bg-primary rounded-lg border border-border-subtle text-accent-gold transition-colors font-mono font-medium"
+                          >
+                            📂 View Raw MyNeta Ledger
+                          </a>
+                          <a 
+                            href="https://affidavit.eci.gov.in/" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-bg-secondary hover:bg-bg-primary rounded-lg border border-border-subtle text-text-primary hover:text-accent-gold transition-colors font-mono font-medium"
+                          >
+                            📥 Download Signed ECI Affidavit (PDF)
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="bg-bg-secondary border border-border-subtle rounded-2xl p-16 text-center space-y-3.5">
