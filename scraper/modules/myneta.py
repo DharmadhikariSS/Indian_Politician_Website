@@ -195,7 +195,35 @@ class MyNetaScraper:
             data["criminalCases"] = criminal_cases_count
             data["criminalCaseList"] = criminal_cases_list
 
-            data["photoUrl"] = f"https://placehold.co/400x400/1C2128/E6EDF3?text={data['name'].replace(' ', '+')}"
+            # Try to scrape the official candidate portrait URL from MyNeta/ECI
+            photo_url = None
+            try:
+                # Look for img tag whose src is related to candidate images or photos
+                img_tags = soup.find_all("img")
+                for img in img_tags:
+                    src = img.get("src", "")
+                    if "candidate_images" in src or "candidates/" in src or "photo" in src or "candidate_detail" in src:
+                        photo_url = src
+                        break
+                
+                # If we found an image, resolve the full absolute URL
+                if photo_url:
+                    if not photo_url.startswith("http"):
+                        # Extract domain/base URL
+                        base_url_match = re.match(r"(https?://[^/]+)", url)
+                        if base_url_match:
+                            domain = base_url_match.group(1)
+                            photo_url = f"{domain}/{photo_url.lstrip('/')}"
+                        else:
+                            photo_url = f"https://myneta.info/{photo_url.lstrip('/')}"
+            except Exception as img_err:
+                logging.warning(f"Failed parsing candidate photo URL: {img_err}")
+
+            if photo_url:
+                data["photoUrl"] = photo_url
+            else:
+                data["photoUrl"] = f"https://placehold.co/400x400/1C2128/E6EDF3?text={data['name'].replace(' ', '+')}"
+                
             data["isVerified"] = True
             data["flags"] = {}
 

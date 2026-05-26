@@ -1,6 +1,6 @@
 [
   {
-    "name": "Lok Sabha 2024",
+    "name": "NIMIT",
     "party": "IND",
     "state": "India",
     "constituency": "Unknown Constituency",
@@ -42,30 +42,30 @@
     ],
     "criminalCases": 0,
     "criminalCaseList": [],
-    "photoUrl": "https://placehold.co/400x400/1C2128/E6EDF3?text=Lok+Sabha+2024",
+    "photoUrl": "https://placehold.co/400x400/1C2128/E6EDF3?text=NIMIT",
     "isVerified": true,
     "flags": {},
-    "attendancePct": 40,
+    "attendancePct": 38,
     "parliamentActivity": {
-      "attendance": 40,
-      "debatesCount": 113,
-      "questionsCount": 344,
-      "privateMemberBills": 3,
+      "attendance": 38,
+      "debatesCount": 128,
+      "questionsCount": 202,
+      "privateMemberBills": 4,
       "attendanceAvg": 76,
       "debatesAvg": 22,
       "questionsAvg": 95,
       "billsAvg": 0.8
     },
     "electoralBonds": [],
-    "aiScore": 85,
+    "aiScore": 75,
     "integrityDetails": {
-      "financialIntegrity": 95,
-      "publicService": 46,
+      "financialIntegrity": 85,
+      "publicService": 44,
       "criminalHistory": 100,
       "riskLevel": "LOW",
-      "summary": "Lok Sabha 2024 is a MLA representing the Unknown Constituency constituency in India from the IND party. Standard checks identify Lok Sabha 2024 as a low-risk public representative with a pristine integrity rating of 85/100. They present clean financial declarations and exemplary governance devotion indices.",
+      "summary": "NIMIT is a MLA representing the Unknown Constituency constituency in India from the IND party. Standard checks identify NIMIT as a low-risk public representative with a pristine integrity rating of 75/100. They present clean financial declarations and exemplary governance devotion indices.",
       "riskFactors": [
-        "Low legislative session attendance record (40%)"
+        "Critically poor legislative session attendance record (38%)"
       ],
       "positiveContributions": [
         "Pristine / clean criminal record with zero active cases"

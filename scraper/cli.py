@@ -5,6 +5,25 @@ import argparse
 import logging
 from bs4 import BeautifulSoup
 
+def load_env():
+    # Try to load .env from root, parent, or current directories
+    for path in [".env", "../.env", "scraper/.env"]:
+        if os.path.exists(path):
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    for line in f:
+                        line = line.strip()
+                        if line and not line.startswith("#") and "=" in line:
+                            k, v = line.split("=", 1)
+                            os.environ[k.strip()] = v.strip().strip('"').strip("'")
+                logging.info(f"Loaded environment parameters from: {path}")
+            except Exception as e:
+                logging.warning(f"Error loading environment file {path}: {e}")
+            break
+
+# Execute automatic env loading on startup
+load_env()
+
 # Add parent directory to path to ensure relative imports work when executed from the parent directory
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -107,7 +126,7 @@ class IngestionPipelineOrchestrator:
         logging.info(f"=== Ingestion Complete! Calculated AI Integrity Score: {completed_profile['aiScore']} ===")
         return completed_profile
 
-    def bulk_crawl_election_directory(self, index_url, target_state=None):
+    def bulk_crawl_election_directory(self, index_url, target_state=None, limit=3):
         """
         Crawls all candidate profiles listed in an election index directory.
         """
@@ -136,12 +155,16 @@ class IngestionPipelineOrchestrator:
 
         logging.info(f"Found {len(candidate_links)} candidate profiles in election directory.")
         
-        # Limit to first few to prevent sandbox timeouts during demonstration
-        limit = 3
-        logging.info(f"Demonstration mode active. Crawling first {limit} profiles...")
+        # Apply scraping limit (None, 0, or negative means no limit)
+        if limit and limit > 0:
+            logging.info(f"Crawling limited to first {limit} profiles...")
+            links_to_crawl = candidate_links[:limit]
+        else:
+            logging.info("Crawling all discovered candidate profiles without limit...")
+            links_to_crawl = candidate_links
 
         scraped_dataset = []
-        for url in candidate_links[:limit]:
+        for url in links_to_crawl:
             try:
                 candidate_profile = self.process_candidate_url(url)
                 if candidate_profile:
@@ -162,6 +185,7 @@ def main():
     group.add_argument("--bulk", help="Crawl an entire election index page (e.g. state legislative listings)")
     
     parser.add_argument("--state", help="Filter bulk crawl outputs by specific state")
+    parser.add_argument("--limit", type=int, default=3, help="Limit number of profiles crawled in bulk mode (default: 3, set to 0 or negative for unlimited)")
     parser.add_argument("--output", default="politicians_scraped.json", help="Output JSON filename (default: politicians_scraped.json)")
 
     args = parser.parse_args()
@@ -177,7 +201,7 @@ def main():
             logging.error("Failed to process candidate.")
 
     elif args.bulk:
-        results = orchestrator.bulk_crawl_election_directory(args.bulk, target_state=args.state)
+        results = orchestrator.bulk_crawl_election_directory(args.bulk, target_state=args.state, limit=args.limit)
         if results:
             with open(args.output, "w", encoding="utf-8") as f:
                 json.dump(results, f, indent=2, ensure_ascii=False)

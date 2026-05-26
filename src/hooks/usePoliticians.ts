@@ -3,7 +3,10 @@ import { supabase } from '../lib/supabaseClient';
 import type { DetailedPoliticianData } from '../data/politicians';
 import { mockPoliticians } from '../data/politicians';
 
-const isSupabaseConfigured = import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_URL !== 'https://placeholder-url.supabase.co';
+const isSupabaseConfigured = 
+  import.meta.env.VITE_SUPABASE_URL && 
+  import.meta.env.VITE_SUPABASE_URL !== 'https://placeholder-url.supabase.co' &&
+  !import.meta.env.VITE_SUPABASE_URL.includes('your-project-id');
 
 export function usePoliticians() {
   return useQuery({
