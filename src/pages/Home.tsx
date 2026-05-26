@@ -228,7 +228,7 @@ const Home = () => {
                       
                       {funnelResults.mp ? (
                         <div className="flex gap-3 items-center text-left">
-                          <img src={funnelResults.mp.photoUrl} alt={funnelResults.mp.name} className="w-10 h-10 object-cover rounded-lg border border-border-subtle shrink-0" />
+                          <img src={funnelResults.mp.photoUrl} alt={funnelResults.mp.name} className="w-10 h-10 object-cover rounded-lg border border-border-subtle shrink-0" referrerPolicy="no-referrer" />
                           <div className="min-w-0">
                             <h4 className="font-heading font-bold text-sm text-text-primary tracking-wide truncate">{funnelResults.mp.name}</h4>
                             <p className="text-[10px] text-text-secondary font-mono truncate">{funnelResults.mp.party} • {funnelResults.mp.constituency}</p>
@@ -265,7 +265,7 @@ const Home = () => {
                       
                       {funnelResults.mla ? (
                         <div className="flex gap-3 items-center text-left">
-                          <img src={funnelResults.mla.photoUrl} alt={funnelResults.mla.name} className="w-10 h-10 object-cover rounded-lg border border-border-subtle shrink-0" />
+                          <img src={funnelResults.mla.photoUrl} alt={funnelResults.mla.name} className="w-10 h-10 object-cover rounded-lg border border-border-subtle shrink-0" referrerPolicy="no-referrer" />
                           <div className="min-w-0">
                             <h4 className="font-heading font-bold text-sm text-text-primary tracking-wide truncate">{funnelResults.mla.name}</h4>
                             <p className="text-[10px] text-text-secondary font-mono truncate">{funnelResults.mla.party} • {funnelResults.mla.constituency}</p>
@@ -303,7 +303,7 @@ const Home = () => {
                       {funnelResults.corporator ? (
                         <div className="space-y-2">
                           <div className="flex gap-3 items-center text-left">
-                            <img src={funnelResults.corporator.photoUrl} alt={funnelResults.corporator.name} className="w-10 h-10 object-cover rounded-lg border border-border-subtle shrink-0" />
+                            <img src={funnelResults.corporator.photoUrl} alt={funnelResults.corporator.name} className="w-10 h-10 object-cover rounded-lg border border-border-subtle shrink-0" referrerPolicy="no-referrer" />
                             <div className="min-w-0">
                               <h4 className="font-heading font-bold text-sm text-text-primary tracking-wide truncate">{funnelResults.corporator.name}</h4>
                               <p className="text-[10px] text-text-secondary font-mono truncate">{funnelResults.corporator.municipalWard ?? 'Ward Member'}</p>

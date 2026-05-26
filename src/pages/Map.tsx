@@ -303,7 +303,7 @@ const Map = () => {
                     <div className="bg-bg-card border border-border-subtle rounded-xl p-3.5 shadow-2xl w-60 text-text-primary flex flex-col gap-2.5 font-sans relative">
                       <div className="flex gap-2.5 items-center">
                         <div className="w-11 h-11 rounded bg-bg-secondary border border-border-subtle overflow-hidden shrink-0">
-                          <img src={p.photoUrl} alt={p.name} className="w-full h-full object-cover" />
+                          <img src={p.photoUrl} alt={p.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                         </div>
                         <div className="min-w-0">
                           <span className="text-[8px] bg-info-blue/15 text-info-blue border border-info-blue/30 px-1.5 py-0.5 rounded font-bold font-mono">

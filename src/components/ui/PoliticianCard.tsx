@@ -45,6 +45,7 @@ export function PoliticianCard({ data, layout = 'grid' }: PoliticianCardProps) {
             src={data.photoUrl || "https://placehold.co/400x400/161B22/E6EDF3?text=Photo"} 
             alt={data.name} 
             className={`absolute top-0 left-0 w-full h-full object-cover ${isList ? 'rounded-l-xl' : ''}`}
+            referrerPolicy="no-referrer"
           />
           <div className="absolute top-2 right-2 flex flex-col gap-2 items-end">
             <div className="bg-bg-primary/90 backdrop-blur-sm p-1 rounded-full shadow-md">

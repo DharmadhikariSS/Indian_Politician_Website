@@ -212,7 +212,7 @@ const Compare = () => {
                   <X size={18} />
                 </button>
                 <div className="w-16 h-16 rounded-full overflow-hidden border border-border-subtle shrink-0">
-                  <img src={p1.photoUrl} alt={p1.name} className="w-full h-full object-cover" />
+                  <img src={p1.photoUrl} alt={p1.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                 </div>
                 <div className="min-w-0 flex-1 space-y-1">
                   <div className="flex items-center gap-2">
@@ -263,7 +263,7 @@ const Compare = () => {
                         >
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full overflow-hidden border border-border-subtle shrink-0">
-                              <img src={item.photoUrl} alt={item.name} className="w-full h-full object-cover" />
+                              <img src={item.photoUrl} alt={item.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                             </div>
                             <div>
                               <h4 className="font-heading font-bold text-sm text-text-primary">{item.name}</h4>
@@ -295,7 +295,7 @@ const Compare = () => {
                   <X size={18} />
                 </button>
                 <div className="w-16 h-16 rounded-full overflow-hidden border border-border-subtle shrink-0">
-                  <img src={p2.photoUrl} alt={p2.name} className="w-full h-full object-cover" />
+                  <img src={p2.photoUrl} alt={p2.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                 </div>
                 <div className="min-w-0 flex-1 space-y-1">
                   <div className="flex items-center gap-2">
@@ -346,7 +346,7 @@ const Compare = () => {
                         >
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full overflow-hidden border border-border-subtle shrink-0">
-                              <img src={item.photoUrl} alt={item.name} className="w-full h-full object-cover" />
+                              <img src={item.photoUrl} alt={item.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                             </div>
                             <div>
                               <h4 className="font-heading font-bold text-sm text-text-primary">{item.name}</h4>

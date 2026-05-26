@@ -292,7 +292,7 @@ const DemocracyMatch = () => {
                         {/* Candidate Identity */}
                         <div className="flex gap-4 items-center min-w-0">
                           <div className="w-14 h-14 rounded-xl overflow-hidden border border-border-subtle shrink-0 bg-bg-card">
-                            <img src={p.photoUrl} alt={p.name} className="w-full h-full object-cover" />
+                            <img src={p.photoUrl} alt={p.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                           </div>
                           <div className="space-y-1.5 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">

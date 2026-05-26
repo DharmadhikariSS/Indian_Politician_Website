@@ -335,7 +335,7 @@ const Rankings = () => {
                   <Link to={`/politician/${podium[0].id}`} className="w-full text-center">
                     <div className="relative rounded-2xl border border-border-subtle bg-bg-card/40 hover:bg-bg-card hover:border-text-secondary transition-all p-5 space-y-3.5 flex flex-col items-center">
                       <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-[#A0A0A0] relative shadow bg-bg-secondary">
-                        <img src={podium[0].photoUrl} alt={podium[0].name} className="w-full h-full object-cover" />
+                        <img src={podium[0].photoUrl} alt={podium[0].name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                         <span className="absolute bottom-0 right-0 bg-[#A0A0A0] text-bg-primary font-bold text-xs w-5 h-5 rounded-full flex items-center justify-center">2</span>
                       </div>
                       <div>
@@ -361,7 +361,7 @@ const Rankings = () => {
                       <Crown className="text-accent-gold animate-bounce absolute top-[-16px] z-10" size={24} />
                       
                       <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-accent-gold relative shadow-lg bg-bg-secondary">
-                        <img src={podium[1].photoUrl} alt={podium[1].name} className="w-full h-full object-cover" />
+                        <img src={podium[1].photoUrl} alt={podium[1].name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                         <span className="absolute bottom-0 right-0 bg-accent-gold text-bg-primary font-bold text-xs w-6 h-6 rounded-full flex items-center justify-center">1</span>
                       </div>
                       <div>
@@ -385,7 +385,7 @@ const Rankings = () => {
                   <Link to={`/politician/${podium[2].id}`} className="w-full text-center">
                     <div className="relative rounded-2xl border border-border-subtle bg-bg-card/40 hover:bg-bg-card hover:border-text-secondary transition-all p-5 space-y-3.5 flex flex-col items-center">
                       <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-[#CD7F32] relative shadow bg-bg-secondary">
-                        <img src={podium[2].photoUrl} alt={podium[2].name} className="w-full h-full object-cover" />
+                        <img src={podium[2].photoUrl} alt={podium[2].name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                         <span className="absolute bottom-0 right-0 bg-[#CD7F32] text-bg-primary font-bold text-xs w-5 h-5 rounded-full flex items-center justify-center">3</span>
                       </div>
                       <div>
@@ -460,7 +460,7 @@ const Rankings = () => {
                             <td className="py-3.5 px-6 font-sans">
                               <div className="flex items-center gap-3">
                                 <div className="w-9 h-9 rounded bg-bg-secondary border border-border-subtle overflow-hidden shrink-0">
-                                  <img src={politician.photoUrl} alt={politician.name} className="w-full h-full object-cover" />
+                                  <img src={politician.photoUrl} alt={politician.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                                 </div>
                                 <div className="min-w-0">
                                   <p className="font-bold text-text-primary group-hover:text-accent-gold transition-colors truncate">

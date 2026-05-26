@@ -199,6 +199,7 @@ const PoliticianProfile = () => {
               src={politician.photoUrl} 
               alt={politician.name} 
               className="w-full h-full object-cover"
+              referrerPolicy="no-referrer"
             />
             {politician.isVerified && (
               <div className="absolute bottom-2 left-2 bg-info-blue text-white p-1 rounded-full shadow-md" title="Verified Profile">
@@ -440,7 +441,7 @@ const PoliticianProfile = () => {
                     
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 rounded-xl overflow-hidden border border-border-subtle bg-bg-secondary shrink-0">
-                        <img src={opponent.photoUrl} alt={opponent.name} className="w-full h-full object-cover" />
+                        <img src={opponent.photoUrl} alt={opponent.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">

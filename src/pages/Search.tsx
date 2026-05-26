@@ -234,6 +234,7 @@ const Search = () => {
                           src={politician.photoUrl} 
                           alt={politician.name} 
                           className="w-full h-full object-cover"
+                          referrerPolicy="no-referrer"
                         />
                         {politician.isVerified && (
                           <div className="absolute bottom-0 right-0 bg-info-blue p-0.5 rounded-tl shadow text-[8px] font-bold text-white">
