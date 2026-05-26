@@ -45,10 +45,18 @@ const Rankings = () => {
     setSelectedParty('all');
   };
 
-  // Convert Net Worth string (e.g. "45Cr", "0.12Cr") to numerical Crores
-  const getNetWorthInCrores = (netWorthStr: string): number => {
-    const numericPart = parseFloat(netWorthStr.replace(/[^\d.-]/g, ''));
-    return isNaN(numericPart) ? 0 : numericPart;
+  // Convert Net Worth string (e.g. "45Cr", "50Lakh") to numerical Crores
+  const parseNetWorth = (val: string | number | undefined | null): number => {
+    if (!val) return 0;
+    if (typeof val === 'number') return val;
+    const clean = val.replace(/[₹\s,]/g, '').toLowerCase();
+    const match = clean.match(/([\d.]+)(cr|lakh|l)?/);
+    if (!match) return 0;
+    const num = parseFloat(match[1]);
+    const unit = match[2];
+    if (unit === 'cr') return num;
+    if (unit === 'lakh' || unit === 'l') return num / 100;
+    return num;
   };
 
   // Filtered & Sorted politicians based on active board

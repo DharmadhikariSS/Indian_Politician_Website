@@ -56,6 +56,30 @@ const stateCenters: Record<string, { coords: [number, number]; zoom: number }> =
   'Kerala': { coords: [10.8505, 76.2711], zoom: 8 }
 };
 
+// Deterministic pseudo-random coordinate offset generator based on constituency and ID
+const getPoliticianCoordinates = (id: string, state: string, constituency: string): [number, number] => {
+  // 1. Check predefined exact coordinates first
+  if (politicianCoordinates[id]) return politicianCoordinates[id];
+  const cleanId = id.replace('scraped-', '').replace('bulk-scraped-', '');
+  if (politicianCoordinates[cleanId]) return politicianCoordinates[cleanId];
+
+  // 2. Fallback to state centers with a consistent spatial offset
+  const stateCenter = stateCenters[state] || stateCenters['India'];
+  
+  // Use a simple hash of constituency name and id to get a consistent offset
+  let hash = 0;
+  const str = constituency + id;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  
+  // Offset within a small box (approx ~0.6 degrees (~60km) around the state center)
+  const latOffset = ((hash & 0xFF) / 255 - 0.5) * 0.7;
+  const lngOffset = (((hash >> 8) & 0xFF) / 255 - 0.5) * 0.7;
+  
+  return [stateCenter.coords[0] + latOffset, stateCenter.coords[1] + lngOffset];
+};
+
 // Custom component to dynamically pan Leaflet viewport
 interface ChangeViewProps {
   center: [number, number];
@@ -77,12 +101,9 @@ const Map = () => {
   const [selectedState, setSelectedState] = useState('India');
   const [activePinId, setActivePinId] = useState<string | null>(null);
 
-  // Group politicians that have coordinates defined (supporting both mock and scraped ID patterns)
+  // All politicians are mapped dynamically using our spatial coordinator
   const mappedPoliticians = useMemo(() => {
-    return politicians.filter(p => {
-      const coordKey = p.id.replace('scraped-', '');
-      return politicianCoordinates[coordKey] || politicianCoordinates[p.id];
-    });
+    return politicians;
   }, [politicians]);
 
   // Breakdown metrics for the sidebar
@@ -282,8 +303,7 @@ const Map = () => {
 
             {/* Place Markers pins for each mapped politician */}
             {mappedPoliticians.map(p => {
-              const coordKey = p.id.replace('scraped-', '');
-              const coords = politicianCoordinates[coordKey] || politicianCoordinates[p.id];
+              const coords = getPoliticianCoordinates(p.id, p.state, p.constituency);
               const isActive = activePinId === p.id;
               
               return (

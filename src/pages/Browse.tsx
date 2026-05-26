@@ -26,10 +26,20 @@ import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Card, CardContent } from '../components/ui/Card';
 
+const getStandardizedRole = (param: string): string => {
+  const lower = param.toLowerCase();
+  if (lower === 'mp' || lower.includes('parliament') || lower.includes('lok sabha') || lower.includes('rajya sabha')) return 'mp';
+  if (lower === 'mla' || lower.includes('assembly') || lower.includes('legislative')) return 'mla';
+  if (lower === 'corporator' || lower.includes('councillor')) return 'corporator';
+  if (lower === 'executive' || lower.includes('minister') || lower.includes('pm') || lower.includes('cm') || lower.includes('prime') || lower.includes('chief')) return 'executive';
+  return param;
+};
+
 const Browse = () => {
   const { data: politicians = [], isLoading } = usePoliticians();
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialRole = searchParams.get('role') || 'all';
+  const initialRoleParam = searchParams.get('role') || 'all';
+  const initialRole = getStandardizedRole(initialRoleParam);
 
   // Filters State
   const [searchQuery, setSearchQuery] = useState('');
@@ -49,7 +59,7 @@ const Browse = () => {
   useEffect(() => {
     const roleParam = searchParams.get('role');
     if (roleParam) {
-      setSelectedRole(roleParam);
+      setSelectedRole(getStandardizedRole(roleParam));
     }
   }, [searchParams]);
 
@@ -96,10 +106,18 @@ const Browse = () => {
     setSearchParams({});
   };
 
-  // Convert Net Worth string (e.g. "45Cr", "0.12Cr") to numerical Crores for range comparison
-  const getNetWorthInCrores = (netWorthStr: string): number => {
-    const numericPart = parseFloat(netWorthStr.replace(/[^\d.-]/g, ''));
-    return isNaN(numericPart) ? 0 : numericPart;
+  // Convert Net Worth (e.g. "45Cr", "50Lakh") to numerical Crores for range comparison
+  const parseNetWorth = (val: string | number | undefined | null): number => {
+    if (!val) return 0;
+    if (typeof val === 'number') return val;
+    const clean = val.replace(/[₹\s,]/g, '').toLowerCase();
+    const match = clean.match(/([\d.]+)(cr|lakh|l)?/);
+    if (!match) return 0;
+    const num = parseFloat(match[1]);
+    const unit = match[2];
+    if (unit === 'cr') return num;
+    if (unit === 'lakh' || unit === 'l') return num / 100;
+    return num;
   };
 
   // Filter & Sort Logic
@@ -123,9 +141,20 @@ const Browse = () => {
         if (selectedState !== 'all' && politician.state !== selectedState) return false;
         if (selectedParty !== 'all' && politician.party !== selectedParty) return false;
         
-        // Handle specific role matching
+        // Handle specific role matching (standardized categories)
         if (selectedRole !== 'all') {
-          if (politician.role !== selectedRole) return false;
+          const roleLower = politician.role.toLowerCase();
+          if (selectedRole === 'mp') {
+            if (!roleLower.includes('mp') && !roleLower.includes('parliament') && !roleLower.includes('lok sabha') && !roleLower.includes('rajya sabha')) return false;
+          } else if (selectedRole === 'mla') {
+            if (!roleLower.includes('mla') && !roleLower.includes('assembly') && !roleLower.includes('legislative')) return false;
+          } else if (selectedRole === 'corporator') {
+            if (!roleLower.includes('corporator') && !roleLower.includes('councillor') && !roleLower.includes('ward')) return false;
+          } else if (selectedRole === 'executive') {
+            if (!roleLower.includes('prime minister') && !roleLower.includes('chief minister') && !roleLower.includes('minister') && !roleLower.includes('pm') && !roleLower.includes('cm')) return false;
+          } else {
+            if (politician.role !== selectedRole) return false;
+          }
         }
 
         // AI Score Bracket
@@ -146,7 +175,7 @@ const Browse = () => {
 
         // Net Worth Brackets
         if (selectedNetWorth !== 'all') {
-          const crores = getNetWorthInCrores(politician.netWorth);
+          const crores = parseNetWorth(politician.netWorth);
           if (selectedNetWorth === 'under-1' && crores >= 1) return false;
           if (selectedNetWorth === '1-10' && (crores < 1 || crores > 10)) return false;
           if (selectedNetWorth === '10-100' && (crores < 10 || crores > 100)) return false;
@@ -169,7 +198,7 @@ const Browse = () => {
           return b.aiScore - a.aiScore; // Cleanest first
         }
         if (sortBy === 'netWorth-desc') {
-          return getNetWorthInCrores(b.netWorth) - getNetWorthInCrores(a.netWorth);
+          return parseNetWorth(b.netWorth) - parseNetWorth(a.netWorth);
         }
         if (sortBy === 'criminal-desc') {
           return b.criminalCases - a.criminalCases;
@@ -311,9 +340,10 @@ const Browse = () => {
               className="w-full bg-bg-card border border-border-subtle rounded px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-accent-gold"
             >
               <option value="all">All Roles</option>
-              {uniqueRoles.filter(r => r !== 'all').map(role => (
-                <option key={role} value={role}>{role}</option>
-              ))}
+              <option value="mp">Members of Parliament (MPs)</option>
+              <option value="mla">Members of Legislative Assembly (MLAs)</option>
+              <option value="corporator">Municipal Corporators</option>
+              <option value="executive">Ministers & Chiefs (PM, CM, Ministers)</option>
             </select>
           </div>
 
@@ -363,7 +393,7 @@ const Browse = () => {
             <div className="space-y-1.5 font-sans">
               {[
                 { key: 'all', label: 'Any Record Status' },
-                { key: 'clean', label: 'Prinstine / Clean Record Only' },
+                { key: 'clean', label: 'Pristine / Clean Record Only' },
                 { key: 'has-cases', label: '1+ Declared Active Cases' },
                 { key: 'severe', label: 'Severe / 4+ Pending Cases' }
               ].map(item => (
@@ -389,7 +419,7 @@ const Browse = () => {
               onChange={(e) => setSelectedNetWorth(e.target.value)}
               className="w-full bg-bg-card border border-border-subtle rounded px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-accent-gold"
             >
-              <option value="all">Any Assets Dec</option>
+              <option value="all">Any Asset Net Worth</option>
               <option value="under-1">Under ₹1 Crore</option>
               <option value="1-10">₹1 Crore - ₹10 Crores</option>
               <option value="10-100">₹10 Crores - ₹100 Crores</option>

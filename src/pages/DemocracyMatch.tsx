@@ -83,9 +83,16 @@ const DemocracyMatch = () => {
       // Filter by Role
       .filter(p => {
         if (selectedRole === 'ALL') return true;
-        if (selectedRole === 'MP') return p.role.includes('MP');
-        if (selectedRole === 'MLA') return p.role === 'MLA';
-        if (selectedRole === 'Corporator') return p.role === 'Corporator';
+        const roleLower = p.role.toLowerCase();
+        if (selectedRole === 'MP') {
+          return roleLower.includes('mp') || roleLower.includes('parliament') || roleLower.includes('lok sabha') || roleLower.includes('rajya sabha');
+        }
+        if (selectedRole === 'MLA') {
+          return roleLower.includes('mla') || roleLower.includes('assembly') || roleLower.includes('legislative');
+        }
+        if (selectedRole === 'Corporator') {
+          return roleLower.includes('corporator') || roleLower.includes('councillor');
+        }
         return true;
       })
       // Sort by Match Percentage descending
