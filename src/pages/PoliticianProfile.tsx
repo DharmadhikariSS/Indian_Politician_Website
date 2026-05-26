@@ -297,7 +297,7 @@ const PoliticianProfile = () => {
                 : 'text-text-secondary hover:text-text-primary'
             }`}
           >
-            <BookOpen size={16} /> Legislative Telemetry ({politician.attendancePct}%)
+            <BookOpen size={16} /> Legislative Telemetry ({politician.isAttendanceExempt ? 'Exempt' : `${politician.attendancePct}%`})
           </button>
         )}
         <button
@@ -829,73 +829,98 @@ const PoliticianProfile = () => {
         {/* ===================== TAB 4: LEGISLATIVE ===================== */}
         {activeTab === 'legislative' && politician.parliamentActivity && (
           <div className="space-y-6">
-            
-            {/* Legislative comparative KPIs */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 font-mono text-center">
-              <div className="bg-bg-secondary border border-border-subtle p-4 rounded-xl shadow">
-                <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">REPRESENTATIVE ATTENDANCE</p>
-                <p className="text-2xl font-bold text-info-blue mt-1.5">{politician.parliamentActivity.attendance}%</p>
-                <p className="text-[10px] text-text-secondary mt-1">Regional Average: {politician.parliamentActivity.attendanceAvg}%</p>
+            {politician.isAttendanceExempt ? (
+              <div className="bg-bg-secondary/40 border border-border-subtle rounded-2xl p-6 md:p-8 space-y-4">
+                <div className="flex flex-col md:flex-row gap-6 items-start">
+                  <div className="p-4 bg-info-blue/10 border border-info-blue/20 text-info-blue rounded-2xl shrink-0">
+                    <BookOpen size={32} />
+                  </div>
+                  <div className="space-y-3">
+                    <h3 className="font-heading text-xl font-bold text-text-primary">
+                      Legislative Telemetry: Exempt
+                    </h3>
+                    <p className="text-sm text-text-secondary leading-relaxed max-w-3xl">
+                      As a <strong>{politician.role}</strong>, this representative serves in an executive leadership capacity (such as Prime Minister, Cabinet Minister, Chief Minister, or State Executive).
+                    </p>
+                    <p className="text-sm text-text-secondary leading-relaxed max-w-3xl">
+                      Under Indian parliamentary standards and PRS Legislative Research guidelines, individual legislative activity metrics—including house attendance, participation in debates, submission of questions, and introduction of Private Member Bills—are <strong>not tracked or applicable</strong> for ministers and chief executives, as their primary responsibility lies in cabinet governance and executive administration.
+                    </p>
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-bg-secondary rounded-lg border border-border-subtle text-xs font-mono font-medium text-accent-gold mt-2">
+                      <span>Reason:</span>
+                      <span className="text-text-primary">{politician.attendanceExemptReason || 'Executive Office'}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="bg-bg-secondary border border-border-subtle p-4 rounded-xl shadow">
-                <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">DEBATES PARTICIPATION</p>
-                <p className="text-2xl font-bold text-text-primary mt-1.5">{politician.parliamentActivity.debatesCount}</p>
-                <p className="text-[10px] text-text-secondary mt-1">Regional Average: {politician.parliamentActivity.debatesAvg}</p>
-              </div>
-              <div className="bg-bg-secondary border border-border-subtle p-4 rounded-xl shadow">
-                <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">QUESTIONS SUBMITTED</p>
-                <p className="text-2xl font-bold text-text-primary mt-1.5">{politician.parliamentActivity.questionsCount}</p>
-                <p className="text-[10px] text-text-secondary mt-1">Regional Average: {politician.parliamentActivity.questionsAvg}</p>
-              </div>
-              <div className="bg-bg-secondary border border-border-subtle p-4 rounded-xl shadow">
-                <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">PRIVATE MEMBER BILLS</p>
-                <p className="text-2xl font-bold text-text-primary mt-1.5">{politician.parliamentActivity.privateMemberBills}</p>
-                <p className="text-[10px] text-text-secondary mt-1">Regional Average: {politician.parliamentActivity.billsAvg}</p>
-              </div>
-            </div>
-
-            {/* Performance charts compared to Average */}
-            <Card className="border-border-subtle bg-bg-card">
-              <CardContent className="p-5 space-y-4">
-                <h3 className="font-heading text-lg font-bold text-text-primary border-b border-border-subtle pb-2.5">
-                  LEGISLATIVE ACTIVITY TELEMETRY VS ASSEMBLY AVERAGES
-                </h3>
-                
-                <div className="h-96 w-full pt-4">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={legislativeChartData}
-                      margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" stroke="#30363D" vertical={false} />
-                      <XAxis dataKey="metric" stroke="#8B949E" tickLine={false} style={{ fontSize: 10, fontFamily: 'Space Mono' }} />
-                      <YAxis stroke="#8B949E" tickLine={false} style={{ fontSize: 10, fontFamily: 'Space Mono' }} />
-                      <Tooltip content={<CustomComparativeTooltip />} />
-                      <Legend wrapperStyle={{ fontSize: 10, fontFamily: 'Space Mono', paddingTop: 10 }} />
-                      <Bar 
-                        name="This Representative" 
-                        dataKey="Representative" 
-                        fill="#4299E1" 
-                        radius={[4, 4, 0, 0]} 
-                      />
-                      <Bar 
-                        name="Legislative Average" 
-                        dataKey="Average" 
-                        fill="#1C2128" 
-                        stroke="#30363D"
-                        strokeWidth={1.5}
-                        radius={[4, 4, 0, 0]} 
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
+            ) : (
+              <>
+                {/* Legislative comparative KPIs */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 font-mono text-center">
+                  <div className="bg-bg-secondary border border-border-subtle p-4 rounded-xl shadow">
+                    <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">REPRESENTATIVE ATTENDANCE</p>
+                    <p className="text-2xl font-bold text-info-blue mt-1.5">{politician.parliamentActivity.attendance}%</p>
+                    <p className="text-[10px] text-text-secondary mt-1">Regional Average: {politician.parliamentActivity.attendanceAvg}%</p>
+                  </div>
+                  <div className="bg-bg-secondary border border-border-subtle p-4 rounded-xl shadow">
+                    <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">DEBATES PARTICIPATION</p>
+                    <p className="text-2xl font-bold text-text-primary mt-1.5">{politician.parliamentActivity.debatesCount}</p>
+                    <p className="text-[10px] text-text-secondary mt-1">Regional Average: {politician.parliamentActivity.debatesAvg}</p>
+                  </div>
+                  <div className="bg-bg-secondary border border-border-subtle p-4 rounded-xl shadow">
+                    <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">QUESTIONS SUBMITTED</p>
+                    <p className="text-2xl font-bold text-text-primary mt-1.5">{politician.parliamentActivity.questionsCount}</p>
+                    <p className="text-[10px] text-text-secondary mt-1">Regional Average: {politician.parliamentActivity.questionsAvg}</p>
+                  </div>
+                  <div className="bg-bg-secondary border border-border-subtle p-4 rounded-xl shadow">
+                    <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">PRIVATE MEMBER BILLS</p>
+                    <p className="text-2xl font-bold text-text-primary mt-1.5">{politician.parliamentActivity.privateMemberBills}</p>
+                    <p className="text-[10px] text-text-secondary mt-1">Regional Average: {politician.parliamentActivity.billsAvg}</p>
+                  </div>
                 </div>
 
-                <p className="text-[10px] text-text-secondary leading-relaxed font-sans pt-1 border-t border-border-subtle/50 text-center">
-                  * Note: "Private Bills" are scaled by x50 on the comparative chart to maintain clear visual proportions against high attendance percentages.
-                </p>
-              </CardContent>
-            </Card>
+                {/* Performance charts compared to Average */}
+                <Card className="border-border-subtle bg-bg-card">
+                  <CardContent className="p-5 space-y-4">
+                    <h3 className="font-heading text-lg font-bold text-text-primary border-b border-border-subtle pb-2.5">
+                      LEGISLATIVE ACTIVITY TELEMETRY VS ASSEMBLY AVERAGES
+                    </h3>
+                    
+                    <div className="h-96 w-full pt-4">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart
+                          data={legislativeChartData}
+                          margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" stroke="#30363D" vertical={false} />
+                          <XAxis dataKey="metric" stroke="#8B949E" tickLine={false} style={{ fontSize: 10, fontFamily: 'Space Mono' }} />
+                          <YAxis stroke="#8B949E" tickLine={false} style={{ fontSize: 10, fontFamily: 'Space Mono' }} />
+                          <Tooltip content={<CustomComparativeTooltip />} />
+                          <Legend wrapperStyle={{ fontSize: 10, fontFamily: 'Space Mono', paddingTop: 10 }} />
+                          <Bar 
+                            name="This Representative" 
+                            dataKey="Representative" 
+                            fill="#4299E1" 
+                            radius={[4, 4, 0, 0]} 
+                          />
+                          <Bar 
+                            name="Legislative Average" 
+                            dataKey="Average" 
+                            fill="#1C2128" 
+                            stroke="#30363D"
+                            strokeWidth={1.5}
+                            radius={[4, 4, 0, 0]} 
+                          />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
 
+                    <p className="text-[10px] text-text-secondary leading-relaxed font-sans pt-1 border-t border-border-subtle/50 text-center">
+                      * Note: "Private Bills" are scaled by x50 on the comparative chart to maintain clear visual proportions against high attendance percentages.
+                    </p>
+                  </CardContent>
+                </Card>
+              </>
+            )}
           </div>
         )}
 

@@ -18,6 +18,8 @@ export interface PoliticianData {
   netWorthGrowth: number;
   criminalCases: number;
   attendancePct?: number;
+  isAttendanceExempt?: boolean;
+  attendanceExemptReason?: string;
   flags: {
     edRaid?: boolean;
     convicted?: boolean;
@@ -89,7 +91,22 @@ export function PoliticianCard({ data, layout = 'grid' }: PoliticianCardProps) {
                 <Badge variant="success" className="mt-0.5">Clean Record</Badge>
               )}
             </div>
-            {data.attendancePct !== undefined && (
+            {data.isAttendanceExempt ? (
+              <div className="col-span-2">
+                <div className="flex justify-between items-center mb-1">
+                  <p className="text-[10px] uppercase text-text-secondary font-semibold">Attendance</p>
+                  <p className="text-[10px] text-text-secondary font-mono font-bold bg-bg-secondary px-1.5 py-0.5 rounded truncate max-w-[120px]" title={data.attendanceExemptReason}>
+                    {data.attendanceExemptReason || 'N/A (Exempt)'}
+                  </p>
+                </div>
+                <div className="w-full bg-bg-secondary rounded-full h-1.5 opacity-40">
+                  <div 
+                    className="h-1.5 rounded-full bg-text-secondary" 
+                    style={{ width: '100%' }}
+                  ></div>
+                </div>
+              </div>
+            ) : data.attendancePct !== undefined && (
               <div className="col-span-2">
                 <div className="flex justify-between items-center mb-1">
                   <p className="text-[10px] uppercase text-text-secondary font-semibold">Attendance</p>
