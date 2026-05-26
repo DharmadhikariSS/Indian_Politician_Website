@@ -11,6 +11,17 @@ export interface NewsArticle {
   url: string;
 }
 
+export interface ConflictAlert {
+  id: string;
+  title: string;
+  category: 'Nepotism' | 'Corporate Concession' | 'Trust Wealth' | 'Excise & Cartels' | 'Discretionary Allocation';
+  severity: 'CRITICAL' | 'HIGH' | 'MEDIUM';
+  loopholeExplored: string;
+  hiddenConnection: string;
+  policyNexus: string;
+  citizenRiskScore: number; // 0-10
+}
+
 export interface DetailedPoliticianData extends PoliticianData {
   gender: 'Male' | 'Female' | 'Other';
   age: number;
@@ -81,6 +92,7 @@ export interface DetailedPoliticianData extends PoliticianData {
   agendaExecutionRate?: number;
   localWardFundUtilization?: number;
   grievanceRedressPct?: number;
+  conflictLedger?: ConflictAlert[];
 }
 
 // =============================================================================
@@ -196,6 +208,28 @@ export const mockPoliticians: DetailedPoliticianData[] = [
       { category: 'Economy', pledge: 'Make India $5 trillion economy by 2025', status: 'Lapsed' },
       { category: 'Agriculture', pledge: 'Double farmer income by 2022', status: 'Lapsed' },
       { category: 'Digital India', pledge: 'Digital payments infrastructure in every village', status: 'Progress' }
+    ],
+    conflictLedger: [
+      {
+        id: 'c-modi-1',
+        title: 'Adani Infrastructure Concessions',
+        category: 'Corporate Concession',
+        severity: 'HIGH',
+        loopholeExplored: 'Passing special zoning, fast-track environmental clearance exemptions, and single-vendor airport lease nomination guidelines to enable friendly conglomerate monopolies.',
+        hiddenConnection: 'Gautam Adani (Adani Group), who secured multiple major concessions in municipal airports (including Mumbai/Ahmedabad), coal mines (Hasdeo forests), and ports (Mundra SEZ).',
+        policyNexus: 'Manifesto focus on national private infrastructure asset monetization and rapid port-led developmental logistics (Sagarmala).',
+        citizenRiskScore: 7.8
+      },
+      {
+        id: 'c-modi-2',
+        title: 'Electoral Bonds Anonymity Ledger',
+        category: 'Discretionary Allocation',
+        severity: 'CRITICAL',
+        loopholeExplored: 'Utilizing Money Bill bypass strategies to pass Finance Act amendments that enabled 100% anonymous corporate funding, bypassing standard Rajya Sabha scrutiny.',
+        hiddenConnection: 'Major corporate donors (such as Future Gaming and Megha Engineering) donating hundreds of crores shortly before winning mega-infrastructure tenders.',
+        policyNexus: 'Legislation authorizing anonymous commercial donations to political parties under the guise of black money eradication.',
+        citizenRiskScore: 8.5
+      }
     ]
   },
 
@@ -326,6 +360,18 @@ export const mockPoliticians: DetailedPoliticianData[] = [
       { category: 'Economy', pledge: 'NYAY scheme — ₹72,000/year to poorest 20% families', status: 'Lapsed' },
       { category: 'Farm Welfare', pledge: 'Separate farmers budget', status: 'Lapsed' },
       { category: 'Education', pledge: 'Increase education spending to 6% of GDP', status: 'Progress' }
+    ],
+    conflictLedger: [
+      {
+        id: 'c-rg-1',
+        title: 'National Herald Real Estate Acquisition',
+        category: 'Trust Wealth',
+        severity: 'HIGH',
+        loopholeExplored: 'Utilizing a newly incorporated non-profit shell trust (Young Indian) to acquire a decades-old publishing company (Associated Journals Ltd) and take control of its prime real estate assets across India for a nominal transaction fee of ₹50 Lakhs.',
+        hiddenConnection: 'Shareholder (along with Sonia Gandhi) in Young Indian, which acquired Associated Journals Ltd, taking control of prime assets in Delhi, Mumbai, and Lucknow.',
+        policyNexus: 'Historical state land leases granted to the National Herald for journalism purposes, later repurposed to generate commercial lease revenues.',
+        citizenRiskScore: 7.2
+      }
     ]
   },
 
@@ -449,6 +495,18 @@ export const mockPoliticians: DetailedPoliticianData[] = [
       { category: 'National Security', pledge: 'Implement NRC nationwide', status: 'Lapsed' },
       { category: 'Law & Order', pledge: 'Zero tolerance on infiltration', status: 'Progress' },
       { category: 'National Security', pledge: 'Abrogate Article 370', status: 'Fulfilled' }
+    ],
+    conflictLedger: [
+      {
+        id: 'c-shah-1',
+        title: 'Cooperative Banking & Sports Patronage Nexus',
+        category: 'Discretionary Allocation',
+        severity: 'HIGH',
+        loopholeExplored: 'Leveraging dominant executive political control to capture key leadership nodes in high-revenue cooperative banking unions and sports administration boards (BCCI) without standard transparent public search processes.',
+        hiddenConnection: 'His son, Jay Shah, serving as the Secretary of the BCCI and President of the Asian Cricket Council while holding private corporate interest assets that witnessed significant revenue surges.',
+        policyNexus: 'Manifesto focus on cooperative banking reforms and national sports infrastructure funding, enabling vertical patronage syndicates.',
+        citizenRiskScore: 7.5
+      }
     ]
   },
 
@@ -545,6 +603,18 @@ export const mockPoliticians: DetailedPoliticianData[] = [
       { category: 'Religion & Culture', pledge: 'Ram Mandir in Ayodhya', status: 'Fulfilled' },
       { category: 'Law & Order', pledge: 'End mafia raj in UP', status: 'Progress' },
       { category: 'Employment', pledge: 'Create 10 lakh jobs annually', status: 'Progress' }
+    ],
+    conflictLedger: [
+      {
+        id: 'c-yogi-1',
+        title: 'Gorakhnath Trust & State Patronage Nexus',
+        category: 'Trust Wealth',
+        severity: 'HIGH',
+        loopholeExplored: 'Utilizing massive state security, administrative concessions, and tax exemptions for private religious math trusts, bypassing standard local municipal audits.',
+        hiddenConnection: 'Serve as the Head Priest (Mahant) of the Gorakhnath Math, which holds immense tax-exempt agricultural land, real estate, and educational institutions in eastern UP.',
+        policyNexus: 'Legislative and administrative support for religious tourism corridors, which directly appreciates Math-held commercial assets and properties.',
+        citizenRiskScore: 6.8
+      }
     ]
   },
 
@@ -681,6 +751,18 @@ export const mockPoliticians: DetailedPoliticianData[] = [
       { category: 'Utilities', pledge: 'Free water up to 20,000 litres/month', status: 'Fulfilled' },
       { category: 'Utilities', pledge: 'Free electricity up to 200 units', status: 'Fulfilled' },
       { category: 'Anti-Corruption', pledge: 'Jan Lokpal for Delhi', status: 'Lapsed' }
+    ],
+    conflictLedger: [
+      {
+        id: 'c-kejri-1',
+        title: 'Excise Policy & Liquor Cartel Restructuring',
+        category: 'Excise & Cartels',
+        severity: 'CRITICAL',
+        loopholeExplored: 'Restructuring state alcohol wholesale retail models to increase private distributor margins from 2% to 12%, creating a highly profitable state-backed cartel in exchange for off-the-books campaign financing.',
+        hiddenConnection: 'The South Group liquor lobby associates, operating through party intermediaries (including Vijay Nair), who secured dominant retail concessions in the Delhi market.',
+        policyNexus: 'Passed through custom cabinet directives to bypass assembly audits, leading to active CBI/ED corruption trials and arrests.',
+        citizenRiskScore: 8.8
+      }
     ]
   },
 
@@ -792,6 +874,18 @@ export const mockPoliticians: DetailedPoliticianData[] = [
     manifestoPledges: [
       { category: 'Infrastructure', pledge: 'Complete Purvanchal Expressway (started during SP)', status: 'Fulfilled' },
       { category: 'Education', pledge: 'Free laptop for every graduate student', status: 'Lapsed' }
+    ],
+    conflictLedger: [
+      {
+        id: 'c-akhilesh-1',
+        title: 'Riverfront Sand Mining Allocations',
+        category: 'Discretionary Allocation',
+        severity: 'HIGH',
+        loopholeExplored: 'Allocating sand-mining leases without competitive open bidding processes during his ministerial tenure as Mining Minister, bypassing standard auction regulations.',
+        hiddenConnection: 'Localized sand-mining syndicates and private developers closely linked to SP leadership who secured highly lucrative riverbed extraction licenses.',
+        policyNexus: 'Passed through executive ministerial quotas, enabling significant off-the-books political cash inflows while bypassing standard environment impact assessments.',
+        citizenRiskScore: 7.6
+      }
     ]
   },
 
@@ -888,6 +982,18 @@ export const mockPoliticians: DetailedPoliticianData[] = [
       { category: 'Education', pledge: 'Kanyashree Prakalpa for girl child education', status: 'Fulfilled' },
       { category: 'Healthcare', pledge: 'Swasthya Sathi — free health insurance for all families', status: 'Fulfilled' },
       { category: 'Agriculture', pledge: 'Krishak Bandhu — ₹10,000/year for all farmers', status: 'Fulfilled' }
+    ],
+    conflictLedger: [
+      {
+        id: 'c-mamata-1',
+        title: 'Local Syndicate Cartels & Nepotism Probes',
+        category: 'Nepotism',
+        severity: 'HIGH',
+        loopholeExplored: "Allowing regional party-aligned 'syndicates' to control local sand mining, building construction supply, and cross-border coal transit networks while maintaining complete personal distance from financial benefits.",
+        hiddenConnection: 'Her nephew and political heir, Abhishek Banerjee, who has been heavily scrutinized by federal agencies (ED/CBI) for allegedly coordinating and receiving payoffs from sand-mining and coal-smuggling syndicates.',
+        policyNexus: 'Opposition to federal agency jurisdiction in West Bengal, using state police forces and judicial appeals to protect party intermediaries and relatives from central corruption probes.',
+        citizenRiskScore: 7.4
+      }
     ]
   },
 
@@ -1013,6 +1119,18 @@ export const mockPoliticians: DetailedPoliticianData[] = [
       { category: 'Infrastructure', pledge: 'Nagpur-Mumbai Samruddhi Expressway', status: 'Fulfilled' },
       { category: 'Green Energy', pledge: 'National ethanol blending program E20', status: 'Progress' },
       { category: 'Infrastructure', pledge: 'Build 10,000 km highways/year', status: 'Fulfilled' }
+    ],
+    conflictLedger: [
+      {
+        id: 'c-gadkari-1',
+        title: 'Green Biofuel Policy & Family Ethanol Cartel',
+        category: 'Nepotism',
+        severity: 'CRITICAL',
+        loopholeExplored: 'Aggressively pushing and drafting national fuel policies—specifically mandating a 20% ethanol blend (E20) in petrol—which directly expands commercial demand and pricing for bio-ethanol producers under the guise of an agricultural and green transition.',
+        hiddenConnection: "His sons (Sarang and Nikhil Gadkari) holding key directorships and substantial equity in the Purti Group (Purti Power & Sugar) and Manas Agro Industries, Vidarbha's dominant sugar, distillery, and ethanol-manufacturing conglomerates.",
+        policyNexus: 'Manifesto and ministerial programs establishing mandatory green biofuel purchase guidelines, directly multiplying the corporate revenues of family-held agro-distillery cartels.',
+        citizenRiskScore: 8.9
+      }
     ]
   },
 
@@ -1109,6 +1227,18 @@ export const mockPoliticians: DetailedPoliticianData[] = [
       { category: 'Defence', pledge: 'Induction of Rafale fighter jets', status: 'Fulfilled' },
       { category: 'Defence', pledge: 'Commissioning of INS Vikrant — India-made aircraft carrier', status: 'Fulfilled' },
       { category: 'Make in India', pledge: 'Domestic defence production target of ₹1.75 lakh Cr', status: 'Progress' }
+    ],
+    conflictLedger: [
+      {
+        id: 'c-rajnath-1',
+        title: 'Defence Indigenization & Private Lobbying Nexus',
+        category: 'Corporate Concession',
+        severity: 'HIGH',
+        loopholeExplored: "Utilizing national security exceptions to fast-track 'Aatmanirbhar Bharat' domestic manufacturing mandates, which restricts foreign competition and channels multi-billion-dollar defence budgets to selected domestic private conglomerates.",
+        hiddenConnection: 'Large private domestic defence consortia (such as Adani Defence, Reliance Defence, and Tata Advanced Systems) that secure exclusive joint-ventures with foreign OEMs (Original Equipment Manufacturers).',
+        policyNexus: 'Manifesto guidelines for the domestic indigenization of 100+ military components, creating highly secure private corporate monopoly lanes.',
+        citizenRiskScore: 7.1
+      }
     ]
   },
 
@@ -1230,6 +1360,18 @@ export const mockPoliticians: DetailedPoliticianData[] = [
       { category: 'Education', pledge: 'Free breakfast for all government school students', status: 'Fulfilled' },
       { category: 'Healthcare', pledge: 'Makkalai Thedi Maruthuvam doorstep healthcare', status: 'Fulfilled' },
       { category: 'Social Justice', pledge: 'Increase reservation to 69% in education and jobs', status: 'Fulfilled' }
+    ],
+    conflictLedger: [
+      {
+        id: 'c-stalin-1',
+        title: 'DMK Media Monopolization & Family Distribution Nexus',
+        category: 'Nepotism',
+        severity: 'HIGH',
+        loopholeExplored: 'Utilizing state administrative networks and theater allocation guidelines to ensure family-controlled production houses dominate film distribution, cable broadcasting, and regional television networks.',
+        hiddenConnection: 'His son Udhayanidhi Stalin (State Minister, Film Producer/Red Giant Movies) and grand-nephews Dayanidhi and Kalanithi Maran (owners of Sun Group), who control regional media distribution, cable channels, and FM stations.',
+        policyNexus: 'State cable television corporation updates and screening regulations that disproportionately favor family-owned monopolies while stifling local independent multiplexes.',
+        citizenRiskScore: 7.7
+      }
     ]
   },
 
@@ -1349,6 +1491,18 @@ export const mockPoliticians: DetailedPoliticianData[] = [
     manifestoPledges: [
       { category: 'Infrastructure', pledge: 'Mumbai Coastal Road completion', status: 'Progress' },
       { category: 'Healthcare', pledge: 'COVID-19 vaccination drive in Maharashtra', status: 'Fulfilled' }
+    ],
+    conflictLedger: [
+      {
+        id: 'c-uddhav-1',
+        title: 'BMC Municipal Contracting Cartels & Zoning Concessions',
+        category: 'Discretionary Allocation',
+        severity: 'HIGH',
+        loopholeExplored: 'Utilizing discretionary municipal zoning amendments and fast-tracked civil works allocations to award high-value road building, drainage system, and COVID-19 care contracts to local political proxies and developers.',
+        hiddenConnection: "Close political associates and party-controlled trusts (such as Prabodhan Prakashan, publishers of Saamana) holding prime real-estate concessions. Shiv Sena controlled the Brihanmumbai Municipal Corporation (BMC)—Asia's richest municipal body—for 25+ years.",
+        policyNexus: 'Municipal infrastructure funding allocations that directly favor a selective cartel of civil sub-contractors, while shutting down competitive transparent tenders under the guise of urgent emergency works.',
+        citizenRiskScore: 7.6
+      }
     ]
   }
 ];

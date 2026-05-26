@@ -38,7 +38,8 @@ import {
   ChevronRight,
   BookOpen,
   Newspaper,
-  GitCompare
+  GitCompare,
+  ShieldAlert
 } from 'lucide-react';
 import { usePolitician } from '../hooks/usePoliticians';
 import { mockPoliticians, type DetailedPoliticianData } from '../data/politicians';
@@ -50,7 +51,7 @@ import { Card, CardContent } from '../components/ui/Card';
 const PoliticianProfile = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'overview' | 'financials' | 'criminal' | 'legislative' | 'press' | 'manifesto'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'financials' | 'criminal' | 'legislative' | 'press' | 'manifesto' | 'conflicts'>('overview');
 
   // Find politician by ID using the usePolitician query hook!
   const { data: politician, isLoading } = usePolitician(id);
@@ -319,6 +320,16 @@ const PoliticianProfile = () => {
           }`}
         >
           <FileText size={16} /> Manifesto & Promises ({politician.manifestoPledges?.length || 0})
+        </button>
+        <button
+          onClick={() => setActiveTab('conflicts')}
+          className={`flex items-center gap-2 px-5 py-3 text-xs md:text-sm uppercase font-mono font-bold tracking-wider rounded-lg transition-all ${
+            activeTab === 'conflicts' 
+              ? 'bg-bg-card border border-border-subtle text-accent-gold shadow-md' 
+              : 'text-text-secondary hover:text-text-primary'
+          }`}
+        >
+          <ShieldAlert size={16} /> Conflict Ledger ({politician.conflictLedger?.length || 0})
         </button>
       </div>
 
@@ -1207,6 +1218,214 @@ const PoliticianProfile = () => {
                     )}
                   </CardContent>
                 </Card>
+              </div>
+
+            </div>
+          </div>
+        )}
+
+        {/* ===================== TAB 7: CONFLICTS LEDGER ===================== */}
+        {activeTab === 'conflicts' && (
+          <div className="space-y-6 animate-fadeIn">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              
+              {/* Left Column: Risk Meter & Summary */}
+              <div className="lg:col-span-1 space-y-6">
+                <Card className="border-border-subtle bg-bg-card">
+                  <CardContent className="p-6 text-center space-y-4">
+                    <h3 className="font-heading text-lg font-bold text-text-primary border-b border-border-subtle pb-2.5 uppercase tracking-wide">
+                      Citizen Risk Audit
+                    </h3>
+                    
+                    {/* Radial Risk Meter */}
+                    <div className="relative w-40 h-40 mx-auto flex items-center justify-center">
+                      {/* SVG Circle Gauge */}
+                      <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                        {/* Background track */}
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="40"
+                          fill="transparent"
+                          stroke="#1C2128"
+                          strokeWidth="8"
+                        />
+                        {/* Colored progress bar */}
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="40"
+                          fill="transparent"
+                          stroke={
+                            (politician.conflictLedger && politician.conflictLedger.length > 0 ? (politician.conflictLedger.reduce((sum, c) => sum + c.citizenRiskScore, 0) / politician.conflictLedger.length) : 0) >= 8 ? '#FF4560' :
+                            (politician.conflictLedger && politician.conflictLedger.length > 0 ? (politician.conflictLedger.reduce((sum, c) => sum + c.citizenRiskScore, 0) / politician.conflictLedger.length) : 0) >= 6 ? '#FEB019' : '#00E396'
+                          }
+                          strokeWidth="8"
+                          strokeDasharray={251.3}
+                          strokeDashoffset={251.3 * (1 - (politician.conflictLedger && politician.conflictLedger.length > 0 ? (politician.conflictLedger.reduce((sum, c) => sum + c.citizenRiskScore, 0) / politician.conflictLedger.length) : 0) / 10)}
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                      {/* Center text score */}
+                      <div className="absolute text-center space-y-0.5">
+                        <p className="text-3xl font-mono font-bold text-text-primary">
+                          {politician.conflictLedger && politician.conflictLedger.length > 0
+                            ? (politician.conflictLedger.reduce((sum, c) => sum + c.citizenRiskScore, 0) / politician.conflictLedger.length).toFixed(1)
+                            : '0.0'}
+                        </p>
+                        <p className="text-[9px] uppercase font-mono text-text-secondary tracking-widest">
+                          Risk Index
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Badge 
+                        variant={
+                          (politician.conflictLedger && politician.conflictLedger.length > 0
+                            ? (politician.conflictLedger.reduce((sum, c) => sum + c.citizenRiskScore, 0) / politician.conflictLedger.length) : 0) >= 8 ? 'danger' :
+                          (politician.conflictLedger && politician.conflictLedger.length > 0
+                            ? (politician.conflictLedger.reduce((sum, c) => sum + c.citizenRiskScore, 0) / politician.conflictLedger.length) : 0) >= 6 ? 'warning' : 'success'
+                        }
+                        className="font-mono text-xs py-1 px-3"
+                      >
+                        {
+                          (politician.conflictLedger && politician.conflictLedger.length > 0
+                            ? (politician.conflictLedger.reduce((sum, c) => sum + c.citizenRiskScore, 0) / politician.conflictLedger.length) : 0) >= 8 ? 'CRITICAL EXPOSURE' :
+                          (politician.conflictLedger && politician.conflictLedger.length > 0
+                            ? (politician.conflictLedger.reduce((sum, c) => sum + c.citizenRiskScore, 0) / politician.conflictLedger.length) : 0) >= 6 ? 'MODERATE EXPOSURE' : 'LOW EXPOSURE'
+                        }
+                      </Badge>
+                      <p className="text-xs text-text-secondary leading-relaxed pt-2">
+                        The Citizen Risk Index evaluates family business cartels, corporate funding nexus, and policy loopholes exploited to benefit private interests.
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Audit Guidelines */}
+                <Card className="border-border-subtle bg-bg-card">
+                  <CardContent className="p-5 space-y-3 font-sans text-xs">
+                    <h4 className="font-heading font-bold text-text-primary uppercase tracking-wide border-b border-border-subtle pb-2">
+                      Auditing Parameters
+                    </h4>
+                    <ul className="space-y-2.5 text-text-secondary leading-relaxed">
+                      <li className="flex gap-2">
+                        <strong className="text-accent-gold shrink-0">1. Nepotism:</strong>
+                        <span>Family members holding lucrative corporate director seats receiving public tenders.</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <strong className="text-accent-gold shrink-0">2. Concessions:</strong>
+                        <span>Favorable zoning, tax exemptions, and fast-tracked clearances for friendly syndicates.</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <strong className="text-accent-gold shrink-0">3. Policy Nexus:</strong>
+                        <span>Aggressively enacting mandates (like fuel blends) that enrich family commercial operations.</span>
+                      </li>
+                    </ul>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Right Column: Conflicted Ledger Cases List */}
+              <div className="lg:col-span-2 space-y-4">
+                {politician.conflictLedger && politician.conflictLedger.length > 0 ? (
+                  politician.conflictLedger.map((alert, idx) => (
+                    <Card 
+                      key={idx} 
+                      className={`border bg-bg-card overflow-hidden hover:shadow-lg transition-all ${
+                        alert.severity === 'CRITICAL' ? 'border-danger-red/30' :
+                        alert.severity === 'HIGH' ? 'border-warning-amber/30' : 'border-border-subtle'
+                      }`}
+                    >
+                      {/* Alert Header Row */}
+                      <div className="bg-bg-secondary p-4 flex justify-between items-center border-b border-border-subtle/50 text-xs font-mono">
+                        <div className="flex items-center gap-2.5">
+                          <ShieldAlert 
+                            size={16} 
+                            className={
+                              alert.severity === 'CRITICAL' ? 'text-danger-red' :
+                              alert.severity === 'HIGH' ? 'text-warning-amber' : 'text-info-blue'
+                            } 
+                          />
+                          <span className="font-bold text-text-primary text-sm tracking-wide">
+                            {alert.title}
+                          </span>
+                        </div>
+                        <Badge 
+                          variant={
+                            alert.severity === 'CRITICAL' ? 'danger' :
+                            alert.severity === 'HIGH' ? 'warning' : 'outline'
+                          }
+                          className="font-mono text-[9px] px-2 py-0.5 rounded font-bold"
+                        >
+                          {alert.severity}
+                        </Badge>
+                      </div>
+
+                      {/* Detailed comparative ledger compartments */}
+                      <CardContent className="p-5 space-y-4 font-sans text-xs">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 text-left">
+                          {/* Loophole Column */}
+                          <div className="space-y-1.5 md:col-span-1">
+                            <span className="text-[9px] uppercase font-mono font-bold text-danger-red">
+                              The System Loophole
+                            </span>
+                            <p className="text-text-primary leading-relaxed">
+                              {alert.loopholeExplored}
+                            </p>
+                          </div>
+
+                          {/* Family/Corporate Connection */}
+                          <div className="space-y-1.5 md:col-span-1 border-t md:border-t-0 md:border-x border-border-subtle/40 md:px-4">
+                            <span className="text-[9px] uppercase font-mono font-bold text-accent-gold">
+                              The Hidden Connections
+                            </span>
+                            <p className="text-text-primary leading-relaxed">
+                              {alert.hiddenConnection}
+                            </p>
+                          </div>
+
+                          {/* Policy Nexus */}
+                          <div className="space-y-1.5 md:col-span-1">
+                            <span className="text-[9px] uppercase font-mono font-bold text-info-blue">
+                              The Policy/Manifesto Nexus
+                            </span>
+                            <p className="text-text-primary leading-relaxed">
+                              {alert.policyNexus}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Bottom Score Ribbon */}
+                        <div className="pt-3 border-t border-border-subtle/50 flex justify-between items-center font-mono text-[10px]">
+                          <span className="text-text-secondary">INTEGRITY THREAT MATRIX</span>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-text-secondary">EXPOSURE SCORE:</span>
+                            <span className={`font-bold ${
+                              alert.citizenRiskScore >= 8 ? 'text-danger-red' :
+                              alert.citizenRiskScore >= 6 ? 'text-warning-amber' : 'text-info-blue'
+                            }`}>
+                              {alert.citizenRiskScore} / 10
+                            </span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                ) : (
+                  <div className="bg-bg-secondary border border-border-subtle rounded-2xl p-16 text-center space-y-3.5">
+                    <CheckCircle2 size={48} className="text-success-green mx-auto animate-bounce" />
+                    <div>
+                      <h3 className="font-heading text-xl font-bold text-text-primary uppercase tracking-wide">
+                        PRISTINE INTEGRITY AUDIT
+                      </h3>
+                      <p className="text-sm text-text-secondary max-w-sm mx-auto leading-relaxed font-sans">
+                        No active conflicts of interest, corporate tenders quid pro quo, or nepotism cartels have been mapped for this representative.
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
 
             </div>
