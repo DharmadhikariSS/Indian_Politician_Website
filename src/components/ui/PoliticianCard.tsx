@@ -38,8 +38,8 @@ export function PoliticianCard({ data, layout = 'grid' }: PoliticianCardProps) {
   const isList = layout === 'list';
 
   return (
-    <Link to={`/politician/${data.id}`} className="block transition-transform hover:-translate-y-1 hover:shadow-lg">
-      <Card className={`h-full border-border-subtle bg-bg-card overflow-hidden ${isList ? 'flex flex-row' : 'flex flex-col'}`}>
+    <Link to={`/politician/${data.id}`} className="block">
+      <Card className={`h-full border-border-subtle bg-bg-card overflow-hidden hover-glow ${isList ? 'flex flex-row' : 'flex flex-col'}`}>
         <div className={`relative ${isList ? 'w-48 shrink-0' : 'w-full pt-[75%] bg-bg-secondary'}`}>
           <img 
             src={data.photoUrl || "https://placehold.co/400x400/161B22/E6EDF3?text=Photo"} 

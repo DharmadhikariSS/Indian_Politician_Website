@@ -133,7 +133,7 @@ const Home = () => {
           </p>
           
           {/* Location Funnel Search Box */}
-          <div className="max-w-3xl mx-auto bg-bg-secondary border border-border-subtle p-6 rounded-2xl shadow-xl space-y-6 text-left mb-10">
+          <div className="max-w-3xl mx-auto glass-panel p-6 rounded-2xl shadow-xl space-y-6 text-left mb-10">
             <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
               <div className="space-y-1">
                 <h3 className="font-heading font-bold text-sm text-text-primary uppercase tracking-wider flex items-center gap-1.5">
@@ -211,7 +211,7 @@ const Home = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   
                   {/* MP Tier Card */}
-                  <div className="bg-bg-card border border-border-subtle p-4 rounded-xl flex flex-col justify-between h-full space-y-4">
+                  <div className="glass-panel hover-glow p-4 rounded-xl flex flex-col justify-between h-full space-y-4">
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="text-[9px] font-mono font-bold text-text-secondary uppercase">1. National (MP)</span>
@@ -248,7 +248,7 @@ const Home = () => {
                   </div>
 
                   {/* MLA Tier Card */}
-                  <div className="bg-bg-card border border-border-subtle p-4 rounded-xl flex flex-col justify-between h-full space-y-4">
+                  <div className="glass-panel hover-glow p-4 rounded-xl flex flex-col justify-between h-full space-y-4">
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="text-[9px] font-mono font-bold text-text-secondary uppercase">2. State Assembly (MLA)</span>
@@ -285,7 +285,7 @@ const Home = () => {
                   </div>
 
                   {/* Local Corporator Tier Card */}
-                  <div className="bg-bg-card border border-border-subtle p-4 rounded-xl flex flex-col justify-between h-full space-y-4">
+                  <div className="glass-panel hover-glow p-4 rounded-xl flex flex-col justify-between h-full space-y-4">
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="text-[9px] font-mono font-bold text-text-secondary uppercase">3. Local Municipal (Corporator)</span>
@@ -356,7 +356,7 @@ const Home = () => {
             </Link>
           </div>
 
-          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 border-t border-border-subtle pt-10">
+          <div className="mt-16 glass-panel rounded-2xl p-6 grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="flex flex-col items-center">
               <span className="text-3xl font-mono font-bold text-text-primary">
                 {isLoading ? '...' : `${stats.totalTracked}+`}
@@ -457,7 +457,7 @@ const Home = () => {
                 return (
                   <div 
                     key={article.id} 
-                    className="bg-bg-secondary rounded-xl border border-border-subtle p-5 hover:border-text-secondary transition-colors flex flex-col justify-between"
+                    className="glass-panel hover-glow rounded-xl p-5 flex flex-col justify-between"
                   >
                     <div className="space-y-3">
                       <div className="flex justify-between items-center text-[10px] font-mono text-text-secondary">
@@ -503,7 +503,7 @@ const Home = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {WorkAreas.map((area, idx) => (
-              <div key={idx} className="bg-bg-secondary rounded-xl border border-border-subtle p-6 hover:border-text-secondary transition-colors">
+              <div key={idx} className="glass-panel hover-glow rounded-xl p-6">
                 <h3 className="text-xl font-heading text-accent-gold mb-4 uppercase tracking-wider">{area.level}</h3>
                 <ul className="space-y-3">
                   {area.roles.map((role, rIdx) => (
