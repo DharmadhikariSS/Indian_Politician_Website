@@ -39,7 +39,9 @@ import {
   BookOpen,
   Newspaper,
   GitCompare,
-  ShieldAlert
+  ShieldAlert,
+  Route,
+  MessageSquare
 } from 'lucide-react';
 import { usePolitician } from '../hooks/usePoliticians';
 import { mockPoliticians, type DetailedPoliticianData } from '../data/politicians';
@@ -47,11 +49,17 @@ import { IntegrityScoreGauge } from '../components/ui/IntegrityScoreGauge';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Card, CardContent } from '../components/ui/Card';
+import { CareerTimeline } from '../components/ui/CareerTimeline';
+import { NewsFeed } from '../components/ui/NewsFeed';
+import { CitizenActionPanel } from '../components/ui/CitizenActionPanel';
+import { DynamicText } from '../components/ui/DynamicText';
+import { useI18n } from '../i18n/translations';
 
 const PoliticianProfile = () => {
+  const { t } = useI18n();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'overview' | 'financials' | 'criminal' | 'legislative' | 'press' | 'manifesto' | 'conflicts'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'financials' | 'criminal' | 'legislative' | 'press' | 'manifesto' | 'conflicts' | 'career' | 'actions'>('overview');
 
   // Find politician by ID using the usePolitician query hook!
   const { data: politician, isLoading } = usePolitician(id);
@@ -268,7 +276,7 @@ const PoliticianProfile = () => {
               : 'text-text-secondary hover:text-text-primary'
           }`}
         >
-          <Sparkles size={16} /> AI Assessment & Overview
+          <Sparkles size={16} /> {t('tab_overview')}
         </button>
         <button
           onClick={() => setActiveTab('financials')}
@@ -278,7 +286,7 @@ const PoliticianProfile = () => {
               : 'text-text-secondary hover:text-text-primary'
           }`}
         >
-          <TrendingUp size={16} /> Financial Audits ({politician.netWorth})
+          <TrendingUp size={16} /> {t('tab_financials')} ({politician.netWorth})
         </button>
         <button
           onClick={() => setActiveTab('criminal')}
@@ -288,7 +296,7 @@ const PoliticianProfile = () => {
               : 'text-text-secondary hover:text-text-primary'
           }`}
         >
-          <Scale size={16} /> Criminal trials ({politician.criminalCases})
+          <Scale size={16} /> {t('tab_criminal')} ({politician.criminalCases})
         </button>
         {politician.parliamentActivity && (
           <button
@@ -299,38 +307,58 @@ const PoliticianProfile = () => {
                 : 'text-text-secondary hover:text-text-primary'
             }`}
           >
-            <BookOpen size={16} /> Legislative Telemetry ({politician.isAttendanceExempt ? 'Exempt' : `${politician.attendancePct}%`})
+            <BookOpen size={16} /> {t('tab_parliament')} ({politician.isAttendanceExempt ? t('score_exempt') : `${politician.attendancePct}%`})
           </button>
         )}
         <button
           onClick={() => setActiveTab('press')}
-          className={`flex items-center gap-2 px-5 py-3 text-xs md:text-sm uppercase font-mono font-bold tracking-wider rounded-lg transition-all ${
+          className={`flex items-center gap-2 px-4 py-2.5 text-xs uppercase font-mono font-bold tracking-wider rounded-lg transition-all ${
             activeTab === 'press' 
               ? 'bg-bg-card border border-border-subtle text-accent-gold shadow-md' 
               : 'text-text-secondary hover:text-text-primary'
           }`}
         >
-          <Newspaper size={16} /> Press Scan & Audits ({politician.newsArticles?.length || 0})
+          <Newspaper size={14} /> {t('tab_news')} ({politician.newsArticles?.length || 0})
+        </button>
+        <button
+          onClick={() => setActiveTab('career')}
+          className={`flex items-center gap-2 px-4 py-2.5 text-xs uppercase font-mono font-bold tracking-wider rounded-lg transition-all ${
+            activeTab === 'career' 
+              ? 'bg-bg-card border border-border-subtle text-accent-gold shadow-md' 
+              : 'text-text-secondary hover:text-text-primary'
+          }`}
+        >
+          <Route size={14} /> {t('tab_career')}
         </button>
         <button
           onClick={() => setActiveTab('manifesto')}
-          className={`flex items-center gap-2 px-5 py-3 text-xs md:text-sm uppercase font-mono font-bold tracking-wider rounded-lg transition-all ${
+          className={`flex items-center gap-2 px-4 py-2.5 text-xs uppercase font-mono font-bold tracking-wider rounded-lg transition-all ${
             activeTab === 'manifesto' 
               ? 'bg-bg-card border border-border-subtle text-accent-gold shadow-md' 
               : 'text-text-secondary hover:text-text-primary'
           }`}
         >
-          <FileText size={16} /> Manifesto & Promises ({politician.manifestoPledges?.length || 0})
+          <FileText size={14} /> {t('tab_manifesto')} ({politician.manifestoPledges?.length || 0})
         </button>
         <button
           onClick={() => setActiveTab('conflicts')}
-          className={`flex items-center gap-2 px-5 py-3 text-xs md:text-sm uppercase font-mono font-bold tracking-wider rounded-lg transition-all ${
+          className={`flex items-center gap-2 px-4 py-2.5 text-xs uppercase font-mono font-bold tracking-wider rounded-lg transition-all ${
             activeTab === 'conflicts' 
               ? 'bg-bg-card border border-border-subtle text-accent-gold shadow-md' 
               : 'text-text-secondary hover:text-text-primary'
           }`}
         >
-          <ShieldAlert size={16} /> Conflict Ledger ({politician.conflictLedger?.length || 0})
+          <ShieldAlert size={14} /> {t('tab_conflicts')} ({politician.conflictLedger?.length || 0})
+        </button>
+        <button
+          onClick={() => setActiveTab('actions')}
+          className={`flex items-center gap-2 px-4 py-2.5 text-xs uppercase font-mono font-bold tracking-wider rounded-lg transition-all ${
+            activeTab === 'actions' 
+              ? 'bg-bg-card border border-border-subtle text-accent-gold shadow-md' 
+              : 'text-text-secondary hover:text-text-primary'
+          }`}
+        >
+          <MessageSquare size={14} /> {t('career_action')}
         </button>
       </div>
 
@@ -345,26 +373,26 @@ const PoliticianProfile = () => {
               <Card className="border-border-subtle bg-bg-card">
                 <CardContent className="p-5 space-y-4">
                   <h3 className="font-heading text-lg font-bold text-text-primary border-b border-border-subtle pb-2.5">
-                    BIOGRAPHICAL SNAPSHOT
+                    {t('prof_biography')}
                   </h3>
                   <p className="text-sm text-text-primary leading-relaxed">
-                    {politician.biography}
+                    <DynamicText text={politician.biography} />
                   </p>
                   <div className="border-t border-border-subtle/50 pt-4 space-y-3.5 text-xs font-mono">
                     <div className="flex justify-between">
-                      <span className="text-text-secondary uppercase">Active In Politics:</span>
-                      <span className="font-bold text-text-primary">Since {politician.activeSince}</span>
+                      <span className="text-text-secondary uppercase">{t('prof_active_politics')}:</span>
+                      <span className="font-bold text-text-primary">{t('prof_since')} {politician.activeSince}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-text-secondary uppercase">Electoral Terms:</span>
-                      <span className="font-bold text-text-primary">{politician.termCount} Terms Served</span>
+                      <span className="text-text-secondary uppercase">{t('prof_terms')}:</span>
+                      <span className="font-bold text-text-primary">{politician.termCount} {t('prof_terms_served')}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-text-secondary uppercase">Legislative House:</span>
+                      <span className="text-text-secondary uppercase">{t('prof_house')}:</span>
                       <span className="font-bold text-text-primary">{politician.role}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-text-secondary uppercase">Registered State:</span>
+                      <span className="text-text-secondary uppercase">{t('prof_state_reg')}:</span>
                       <span className="font-bold text-text-primary">{politician.state}</span>
                     </div>
                   </div>
@@ -375,13 +403,13 @@ const PoliticianProfile = () => {
               <Card className="border-border-subtle bg-bg-card">
                 <CardContent className="p-5 space-y-4">
                   <h3 className="font-heading text-lg font-bold text-text-primary border-b border-border-subtle pb-2.5">
-                    INTEGRITY BREAKDOWN INDEX
+                    {t('prof_integrity_breakdown')}
                   </h3>
                   
                   {/* Financial Integrity Progress Bar */}
                   <div className="space-y-1.5">
                     <div className="flex justify-between text-xs font-mono">
-                      <span className="text-text-secondary">FINANCIAL INTEGRITY</span>
+                      <span className="text-text-secondary">{t('prof_financial_integrity')}</span>
                       <span className={`font-bold ${politician.integrityDetails.financialIntegrity < 50 ? 'text-danger-red' : 'text-success-green'}`}>
                         {politician.integrityDetails.financialIntegrity}/100
                       </span>
@@ -397,7 +425,7 @@ const PoliticianProfile = () => {
                   {/* Public Service Progress Bar */}
                   <div className="space-y-1.5">
                     <div className="flex justify-between text-xs font-mono">
-                      <span className="text-text-secondary">PUBLIC SERVICE DELIV</span>
+                      <span className="text-text-secondary">{t('prof_public_service')}</span>
                       <span className={`font-bold ${politician.integrityDetails.publicService < 50 ? 'text-danger-red' : 'text-success-green'}`}>
                         {politician.integrityDetails.publicService}/100
                       </span>
@@ -413,7 +441,7 @@ const PoliticianProfile = () => {
                   {/* Criminal History Progress Bar */}
                   <div className="space-y-1.5">
                     <div className="flex justify-between text-xs font-mono">
-                      <span className="text-text-secondary">CLEAN CRIMINAL RECORD</span>
+                      <span className="text-text-secondary">{t('prof_criminal_record')}</span>
                       <span className={`font-bold ${politician.integrityDetails.criminalHistory < 50 ? 'text-danger-red' : 'text-success-green'}`}>
                         {politician.integrityDetails.criminalHistory}/100
                       </span>
@@ -427,7 +455,7 @@ const PoliticianProfile = () => {
                   </div>
 
                   <p className="text-[10px] text-text-secondary leading-relaxed font-sans pt-1 border-t border-border-subtle/50">
-                    Sub-scores derived using weightings from declared court proceedings (criminal), historical property transactions (financial), and local project allocations (service).
+                    {t('prof_score_source')}
                   </p>
                 </CardContent>
               </Card>
@@ -436,7 +464,7 @@ const PoliticianProfile = () => {
                 <Card className="border-border-subtle bg-bg-card text-left mt-6">
                   <CardContent className="p-5 space-y-4">
                     <h3 className="font-heading text-lg font-bold text-text-primary border-b border-border-subtle pb-2.5 flex items-center gap-1.5">
-                      <GitCompare size={18} className="text-accent-gold" /> STRONGEST OPPOSITION RIVAL
+                      <GitCompare size={18} className="text-accent-gold" /> {t('prof_rival_title')}
                     </h3>
                     
                     <div className="flex items-center gap-4">
@@ -454,7 +482,7 @@ const PoliticianProfile = () => {
 
                     <div className="bg-bg-secondary/40 border border-border-subtle/50 p-3.5 rounded-xl space-y-2.5 text-xs font-mono">
                       <div className="flex justify-between items-center border-b border-border-subtle/50 pb-1.5">
-                        <span className="text-text-secondary uppercase">Integrity Comparison:</span>
+                        <span className="text-text-secondary uppercase">{t('prof_integrity_compare')}:</span>
                         <div className="flex items-center gap-2">
                           <span className={`font-bold ${politician.aiScore < 50 ? 'text-danger-red' : 'text-success-green'}`}>{politician.aiScore}</span>
                           <span className="text-text-secondary text-[10px] font-bold">vs</span>
@@ -463,13 +491,13 @@ const PoliticianProfile = () => {
                       </div>
                       <div className="text-[10px] text-text-secondary leading-normal flex items-start gap-1">
                         <span className="shrink-0 mt-0.5">🎯</span>
-                        <span>{politician.constituencyRivalry?.historicalMarginText ?? 'Contesting regional rival.'}</span>
+                        <span><DynamicText text={politician.constituencyRivalry?.historicalMarginText ?? 'Contesting regional rival.'} /></span>
                       </div>
                     </div>
 
                     <Link to={`/compare?p1=${politician.id}&p2=${opponent.id}`}>
                       <Button className="w-full bg-accent-gold text-bg-primary hover:bg-accent-gold/80 font-mono font-bold text-xs py-2.5 rounded shadow flex items-center justify-center gap-1.5">
-                        <GitCompare size={14} /> COMPARE DEMOCRACY DUEL
+                        <GitCompare size={14} /> {t('prof_compare_btn')}
                       </Button>
                     </Link>
                   </CardContent>
@@ -483,10 +511,10 @@ const PoliticianProfile = () => {
                 {/* Tech banner */}
                 <div className="bg-bg-secondary border-b border-border-subtle p-4 flex items-center justify-between text-xs shrink-0">
                   <div className="flex items-center gap-1.5 text-accent-gold font-mono font-bold">
-                    <Sparkles size={14} /> AI TRANSPARENCY DECISION AUDIT SUMMARY
+                    <Sparkles size={14} /> {t('prof_ai_title')}
                   </div>
                   <span className="text-[10px] text-text-secondary font-mono">
-                    MODEL SUMMARY STATUS: FINAL LEDGER
+                    {t('prof_ai_status')}
                   </span>
                 </div>
 
@@ -494,10 +522,10 @@ const PoliticianProfile = () => {
                   {/* Detailed summary paragraph */}
                   <div className="space-y-2">
                     <h4 className="text-xs font-mono uppercase tracking-wider text-accent-gold font-bold">
-                      EXECUTIVE ASSESSMENT OUTLINE
+                      {t('prof_exec_outline')}
                     </h4>
                     <p className="text-base text-text-primary leading-relaxed font-sans bg-bg-secondary/40 border border-border-subtle/50 rounded-xl p-4">
-                      {politician.integrityDetails.summary}
+                      <DynamicText text={politician.integrityDetails.summary} />
                     </p>
                   </div>
 
@@ -505,7 +533,7 @@ const PoliticianProfile = () => {
                   {politician.integrityDetails.riskFactors.length > 0 && (
                     <div className="space-y-3 pt-3 border-t border-border-subtle">
                       <h4 className="text-xs font-mono uppercase tracking-wider text-danger-red font-bold flex items-center gap-1.5">
-                        <AlertTriangle size={14} className="text-danger-red animate-pulse" /> RED FLAG RISK TRIGGERS IDENTIFIED
+                        <AlertTriangle size={14} className="text-danger-red animate-pulse" /> {t('prof_risk_triggers')}
                       </h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                         {politician.integrityDetails.riskFactors.map((risk, index) => (
@@ -514,7 +542,7 @@ const PoliticianProfile = () => {
                             className="bg-danger-red/5 border border-danger-red/15 rounded-xl p-3.5 text-xs text-text-primary leading-relaxed flex items-start gap-2.5"
                           >
                             <span className="text-danger-red text-base font-bold shrink-0 mt-[-3px]">!</span>
-                            <span className="font-sans font-medium text-text-secondary"><strong className="text-text-primary">Trigger {index+1}:</strong> {risk}</span>
+                            <span className="font-sans font-medium text-text-secondary"><strong className="text-text-primary">{t('prof_trigger')} {index+1}:</strong> <DynamicText text={risk} /></span>
                           </div>
                         ))}
                       </div>
@@ -525,7 +553,7 @@ const PoliticianProfile = () => {
                   {politician.integrityDetails.positiveContributions.length > 0 && (
                     <div className="space-y-3 pt-3 border-t border-border-subtle">
                       <h4 className="text-xs font-mono uppercase tracking-wider text-success-green font-bold flex items-center gap-1.5">
-                        <CheckCircle2 size={14} className="text-success-green" /> KEY PUBLIC SERVICE CONTRIBUTIONS & HIGHLIGHTS
+                        <CheckCircle2 size={14} className="text-success-green" /> {t('prof_positive')}
                       </h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                         {politician.integrityDetails.positiveContributions.map((pos, index) => (
@@ -534,7 +562,7 @@ const PoliticianProfile = () => {
                             className="bg-success-green/5 border border-success-green/15 rounded-xl p-3.5 text-xs text-text-primary leading-relaxed flex items-start gap-2.5 font-sans"
                           >
                             <span className="text-success-green text-base font-bold shrink-0 mt-[-3px]">✓</span>
-                            <span className="font-medium text-text-secondary"><strong className="text-text-primary">Contribution {index+1}:</strong> {pos}</span>
+                            <span className="font-medium text-text-secondary"><strong className="text-text-primary">{t('prof_contribution')} {index+1}:</strong> <DynamicText text={pos} /></span>
                           </div>
                         ))}
                       </div>
@@ -553,33 +581,33 @@ const PoliticianProfile = () => {
             {/* Financial Summary KPIs */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 font-mono text-center">
               <div className="bg-bg-secondary border border-border-subtle p-4 rounded-xl shadow">
-                <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">CURRENT DECLARED NET WORTH</p>
+                <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">{t('fin_net_worth')}</p>
                 <p className="text-2xl font-bold text-accent-gold mt-1.5">₹{politician.netWorth}</p>
-                <p className="text-[10px] text-text-secondary mt-1">Elections declaration cycle (latest)</p>
+                <p className="text-[10px] text-text-secondary mt-1">{t('fin_net_worth_sub')}</p>
               </div>
               <div className="bg-bg-secondary border border-border-subtle p-4 rounded-xl shadow">
-                <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">RELATIVE ASSET GROWTH RATE</p>
+                <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">{t('fin_growth')}</p>
                 <p className={`text-2xl font-bold mt-1.5 flex justify-center items-center gap-1 ${
                   politician.netWorthGrowth > 100 ? 'text-danger-red' : 'text-success-green'
                 }`}>
                   {politician.netWorthGrowth > 0 ? <TrendingUp size={22} /> : <TrendingDown size={22} />}
                   {politician.netWorthGrowth}%
                 </p>
-                <p className="text-[10px] text-text-secondary mt-1">Comparison over preceding terms</p>
+                <p className="text-[10px] text-text-secondary mt-1">{t('fin_growth_sub')}</p>
               </div>
               <div className="bg-bg-secondary border border-border-subtle p-4 rounded-xl shadow">
-                <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">DECLARED LIABILITIES RATIO</p>
+                <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">{t('fin_liabilities')}</p>
                 <p className="text-2xl font-bold text-text-primary mt-1.5">
                   ₹{politician.financialTimeline[politician.financialTimeline.length - 1].liabilities.toFixed(2)}Cr
                 </p>
-                <p className="text-[10px] text-text-secondary mt-1">Outstanding liabilities or debt</p>
+                <p className="text-[10px] text-text-secondary mt-1">{t('fin_liabilities_sub')}</p>
               </div>
               <div className="bg-bg-secondary border border-border-subtle p-4 rounded-xl shadow">
-                <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">CORPORATE BOND SPONSORSHIP</p>
+                <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">{t('fin_bonds')}</p>
                 <p className="text-2xl font-bold text-info-blue mt-1.5">
                   {totalBondsAmount > 0 ? `₹${totalBondsAmount.toFixed(1)}Cr` : '₹0.0Cr'}
                 </p>
-                <p className="text-[10px] text-text-secondary mt-1">Identified corporate donations</p>
+                <p className="text-[10px] text-text-secondary mt-1">{t('fin_bonds_sub')}</p>
               </div>
             </div>
 
@@ -591,7 +619,7 @@ const PoliticianProfile = () => {
                 <Card className="border-border-subtle bg-bg-card h-full">
                   <CardContent className="p-5 space-y-4">
                     <h3 className="font-heading text-lg font-bold text-text-primary border-b border-border-subtle pb-2.5">
-                      HISTORICAL ASSETS DECLARATION CURVE (CRORES IN INR)
+                      {t('fin_chart_title')}
                     </h3>
                     
                     <div className="h-80 w-full pt-4">
@@ -645,7 +673,7 @@ const PoliticianProfile = () => {
                 <Card className="border-border-subtle bg-bg-card h-full">
                   <CardContent className="p-5 space-y-4">
                     <h3 className="font-heading text-lg font-bold text-text-primary border-b border-border-subtle pb-2.5">
-                      ELECTORAL FUNDING SPLIT
+                      {t('fin_pie_title')}
                     </h3>
                     
                     {pieData.length > 0 ? (
@@ -671,7 +699,7 @@ const PoliticianProfile = () => {
                           </ResponsiveContainer>
                           {/* Inner sum label */}
                           <div className="absolute text-center">
-                            <span className="text-[9px] uppercase tracking-wider text-text-secondary font-mono block">TOTAL BOND</span>
+                            <span className="text-[9px] uppercase tracking-wider text-text-secondary font-mono block">{t('fin_total_bond')}</span>
                             <span className="font-mono text-base font-bold text-text-primary">₹{totalBondsAmount.toFixed(1)}Cr</span>
                           </div>
                         </div>
@@ -692,9 +720,9 @@ const PoliticianProfile = () => {
                     ) : (
                       <div className="h-64 flex flex-col items-center justify-center text-center p-4 space-y-2">
                         <Building2 size={32} className="text-text-secondary/40" />
-                        <h4 className="font-heading text-sm font-bold text-text-secondary">NO DONOR DISCLOSURES FOUND</h4>
+                        <h4 className="font-heading text-sm font-bold text-text-secondary">{t('fin_no_donors')}</h4>
                         <p className="text-[10px] text-text-secondary max-w-xs leading-relaxed font-sans">
-                          No corporate entities or electoral trust bonds have been linked to this independent or municipal candidate.
+                          {t('fin_no_donors_sub')}
                         </p>
                       </div>
                     )}
@@ -708,14 +736,14 @@ const PoliticianProfile = () => {
             <Card className="border-border-subtle bg-bg-card">
               <CardContent className="p-5 space-y-4">
                 <h3 className="font-heading text-lg font-bold text-text-primary border-b border-border-subtle pb-2.5">
-                  DECLARED ASSET SOURCES & HOLDING DESCRIPTIONS
+                  {t('fin_sources_title')}
                 </h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {politician.financialTimeline.map((item, idx) => (
                     <div key={idx} className="bg-bg-secondary/40 border border-border-subtle rounded-xl p-4 space-y-2">
                       <div className="flex justify-between items-center border-b border-border-subtle/60 pb-2">
-                        <span className="font-mono text-sm font-bold text-accent-gold">YEAR {item.year}</span>
+                        <span className="font-mono text-sm font-bold text-accent-gold">{t('fin_year')} {item.year}</span>
                         <Badge variant="outline" className="text-[10px] font-mono border-border-subtle">₹{item.assets} Cr</Badge>
                       </div>
                       <ul className="space-y-1.5 pt-1.5">
@@ -747,17 +775,17 @@ const PoliticianProfile = () => {
                 </div>
                 <div>
                   <h3 className="font-heading text-lg font-bold text-text-primary uppercase tracking-wide">
-                    CRIMINAL TRIAL RADAR DISCLOSURE
+                    {t('crim_title')}
                   </h3>
                   <p className="text-xs text-text-secondary leading-relaxed font-sans max-w-xl mt-1">
-                    Indexed FIR court cases declared by candidate under ECI statutory provisions. Status verification confirms active proceedings.
+                    {t('crim_note')}
                   </p>
                 </div>
               </div>
 
               <div className="bg-bg-secondary/70 border border-border-subtle px-6 py-3 rounded-xl font-mono text-center shadow shrink-0">
-                <span className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">ACTIVE CHARGE SHEETS</span>
-                <p className="text-3xl font-bold text-danger-red mt-0.5">{politician.criminalCases} Cases</p>
+                <span className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">{t('crim_total')}</span>
+                <p className="text-3xl font-bold text-danger-red mt-0.5">{politician.criminalCases} {t('crim_active')}</p>
               </div>
             </div>
 
@@ -772,7 +800,7 @@ const PoliticianProfile = () => {
                         <span className="font-bold text-text-primary text-sm flex items-center gap-1.5">
                           <AlertTriangle size={14} className="text-danger-red" /> {trial.caseNumber}
                         </span>
-                        <span className="text-text-secondary">| Filed on {trial.date}</span>
+                        <span className="text-text-secondary">| {t('crim_date')}: {trial.date}</span>
                       </div>
                       <Badge variant={trial.status.includes('Convicted') ? 'danger' : 'outline'} className="border-border-subtle font-bold">
                         {trial.status.toUpperCase()}
@@ -787,7 +815,7 @@ const PoliticianProfile = () => {
                           {trial.charges.map((charge, cIdx) => (
                             <li key={cIdx} className="text-xs text-text-primary leading-relaxed flex items-start gap-1.5">
                               <span className="text-danger-red shrink-0">•</span>
-                              {charge}
+                              <DynamicText text={charge} />
                             </li>
                           ))}
                         </ul>
@@ -795,7 +823,7 @@ const PoliticianProfile = () => {
 
                       {/* Legislative IPC Sections Column */}
                       <div className="md:col-span-1 space-y-2">
-                        <h4 className="text-xs font-mono uppercase tracking-wider text-accent-gold font-bold">IPC SECTIONS LINKED</h4>
+                        <h4 className="text-xs font-mono uppercase tracking-wider text-accent-gold font-bold">{t('crim_section')}</h4>
                         <div className="flex flex-wrap gap-1.5 pt-0.5">
                           {trial.sections.map((section, sIdx) => (
                             <Badge key={sIdx} variant="outline" className="bg-bg-primary/40 border-border-subtle text-text-primary font-mono text-[10px]">
@@ -812,8 +840,8 @@ const PoliticianProfile = () => {
                       <div className="md:col-span-1 space-y-2 font-mono text-xs text-text-secondary">
                         <h4 className="text-xs font-mono uppercase tracking-wider text-text-secondary font-bold">JUDICIAL VENUE</h4>
                         <div className="space-y-1.5 pt-1.5">
-                          <p>COURT: <strong className="text-text-primary">{trial.court}</strong></p>
-                          <p>STAGE: <strong className="text-text-primary">{trial.status}</strong></p>
+                          <p>{t('crim_court')}: <strong className="text-text-primary">{trial.court}</strong></p>
+                          <p>{t('crim_status_label')}: <strong className="text-text-primary">{trial.status}</strong></p>
                           <p>CASE RECORD: <strong className="text-text-primary">VERIFIED LEDGER</strong></p>
                         </div>
                       </div>
@@ -862,10 +890,10 @@ const PoliticianProfile = () => {
                 <CheckCircle2 size={48} className="text-success-green mx-auto animate-bounce" />
                 <div>
                   <h3 className="font-heading text-xl font-bold text-text-primary uppercase tracking-wide">
-                    PRISTINE INTEGRITY • ZERO CHARGES DECLARED
+                    {t('crim_no_cases')}
                   </h3>
                   <p className="text-sm text-text-secondary max-w-sm mx-auto leading-relaxed font-sans">
-                    No active FIRs or criminal indictments have been registered against this candidate in any judicial court in India.
+                    {t('crim_no_cases_sub')}
                   </p>
                 </div>
               </div>
@@ -905,24 +933,24 @@ const PoliticianProfile = () => {
                 {/* Legislative comparative KPIs */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 font-mono text-center">
                   <div className="bg-bg-secondary border border-border-subtle p-4 rounded-xl shadow">
-                    <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">REPRESENTATIVE ATTENDANCE</p>
+                    <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">{t('parl_attendance')}</p>
                     <p className="text-2xl font-bold text-info-blue mt-1.5">{politician.parliamentActivity.attendance}%</p>
-                    <p className="text-[10px] text-text-secondary mt-1">Regional Average: {politician.parliamentActivity.attendanceAvg}%</p>
+                    <p className="text-[10px] text-text-secondary mt-1">{t('parl_national_avg')}: {politician.parliamentActivity.attendanceAvg}%</p>
                   </div>
                   <div className="bg-bg-secondary border border-border-subtle p-4 rounded-xl shadow">
-                    <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">DEBATES PARTICIPATION</p>
+                    <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">{t('parl_debates')}</p>
                     <p className="text-2xl font-bold text-text-primary mt-1.5">{politician.parliamentActivity.debatesCount}</p>
-                    <p className="text-[10px] text-text-secondary mt-1">Regional Average: {politician.parliamentActivity.debatesAvg}</p>
+                    <p className="text-[10px] text-text-secondary mt-1">{t('parl_national_avg')}: {politician.parliamentActivity.debatesAvg}</p>
                   </div>
                   <div className="bg-bg-secondary border border-border-subtle p-4 rounded-xl shadow">
-                    <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">QUESTIONS SUBMITTED</p>
+                    <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">{t('parl_questions')}</p>
                     <p className="text-2xl font-bold text-text-primary mt-1.5">{politician.parliamentActivity.questionsCount}</p>
-                    <p className="text-[10px] text-text-secondary mt-1">Regional Average: {politician.parliamentActivity.questionsAvg}</p>
+                    <p className="text-[10px] text-text-secondary mt-1">{t('parl_national_avg')}: {politician.parliamentActivity.questionsAvg}</p>
                   </div>
                   <div className="bg-bg-secondary border border-border-subtle p-4 rounded-xl shadow">
-                    <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">PRIVATE MEMBER BILLS</p>
+                    <p className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">{t('parl_bills')}</p>
                     <p className="text-2xl font-bold text-text-primary mt-1.5">{politician.parliamentActivity.privateMemberBills}</p>
-                    <p className="text-[10px] text-text-secondary mt-1">Regional Average: {politician.parliamentActivity.billsAvg}</p>
+                    <p className="text-[10px] text-text-secondary mt-1">{t('parl_national_avg')}: {politician.parliamentActivity.billsAvg}</p>
                   </div>
                 </div>
 
@@ -930,7 +958,7 @@ const PoliticianProfile = () => {
                 <Card className="border-border-subtle bg-bg-card">
                   <CardContent className="p-5 space-y-4">
                     <h3 className="font-heading text-lg font-bold text-text-primary border-b border-border-subtle pb-2.5">
-                      LEGISLATIVE ACTIVITY TELEMETRY VS ASSEMBLY AVERAGES
+                      {t('parl_title')}
                     </h3>
                     
                     <div className="h-96 w-full pt-4">
@@ -1009,7 +1037,7 @@ const PoliticianProfile = () => {
                             PUBLISHED BY <strong className="text-text-primary">{article.publisher}</strong> • {article.date}
                           </span>
                           <h4 className="font-heading text-lg font-bold text-text-primary group-hover:text-accent-gold transition-colors">
-                            {article.title}
+                            <DynamicText text={article.title} />
                           </h4>
                         </div>
 
@@ -1031,7 +1059,7 @@ const PoliticianProfile = () => {
                       </div>
 
                       <p className="text-xs text-text-secondary leading-relaxed font-sans">
-                        {article.summary}
+                        <DynamicText text={article.summary} />
                       </p>
 
                       <div className="flex justify-between items-center border-t border-border-subtle/30 pt-3.5 mt-2">
@@ -1432,6 +1460,52 @@ const PoliticianProfile = () => {
             </div>
           </div>
         )}
+
+        {/* ===================== TAB: CAREER JOURNEY ===================== */}
+        {activeTab === 'career' && (
+          <div className="glass-panel rounded-2xl p-6 border border-border-subtle">
+            <div className="mb-4 pb-4 border-b border-border-subtle">
+              <h2 className="font-heading text-xl font-bold text-text-primary">
+                राजनीतिक सफर / Political Journey
+              </h2>
+              <p className="text-xs text-text-muted mt-1">
+                Complete career timeline, party history & family dynasty connections
+              </p>
+            </div>
+            <CareerTimeline politician={politician as any} />
+          </div>
+        )}
+
+        {/* ===================== TAB: NEWS (ENHANCED) ===================== */}
+        {activeTab === 'press' && (
+          <div className="glass-panel rounded-2xl p-6 border border-border-subtle">
+            <div className="mb-4 pb-4 border-b border-border-subtle">
+              <h2 className="font-heading text-xl font-bold text-text-primary">
+                Media Coverage & News
+              </h2>
+              <p className="text-xs text-text-muted mt-1">
+                Articles indexed from 50+ Indian news sources — sentiment classified by AI
+              </p>
+            </div>
+            <NewsFeed politician={politician} />
+          </div>
+        )}
+
+        {/* ===================== TAB: CITIZEN ACTIONS ===================== */}
+        {activeTab === 'actions' && (
+          <div className="max-w-2xl mx-auto glass-panel rounded-2xl p-6 border border-border-subtle">
+            <div className="mb-4 pb-4 border-b border-border-subtle">
+              <h2 className="font-heading text-xl font-bold text-text-primary">
+                🙋 Apna Hak Jaano / Know Your Rights
+              </h2>
+              <p className="text-xs text-text-muted mt-1">
+                File RTI, contact your neta, raise grievances through official channels
+              </p>
+            </div>
+            <CitizenActionPanel politician={politician} />
+          </div>
+        )}
+
       </div>
 
     </div>

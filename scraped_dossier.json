@@ -1,0 +1,40 @@
+{
+  "name": "Nitin Gadkari",
+  "role": "Union Minister",
+  "state": "Maharashtra",
+  "constituency": "Nagpur",
+  "declared_cases": 10,
+  "is_attendance_exempt": true,
+  "attendance_exempt_reason": "Union/State Cabinet Minister",
+  "family_members": [
+    "Nikhil Gadkari (Son)",
+    "Sarang Gadkari (Son)"
+  ],
+  "corporate_directorships": [
+    {
+      "director": "Nikhil Gadkari (Son)",
+      "company_name": "Manas Agro Industries & Infrastructure Ltd",
+      "din": "01234567",
+      "sector": "Sugar & Bio-Ethanol Distilleries",
+      "designation": "Managing Director"
+    },
+    {
+      "director": "Sarang Gadkari (Son)",
+      "company_name": "Manas Agro Industries & Infrastructure Ltd",
+      "din": "01234567",
+      "sector": "Sugar & Bio-Ethanol Distilleries",
+      "designation": "Managing Director"
+    }
+  ],
+  "conflict_ledger": [
+    {
+      "title": "Green Biofuel Policy & Family Ethanol Cartel",
+      "category": "Nepotism",
+      "severity": "CRITICAL",
+      "loophole_explored": "Aggressively pushing and drafting national fuel policies—specifically mandating a 20% ethanol blend (E20) in petrol—which directly expands commercial demand and pricing for bio-ethanol producers under the guise of an agricultural and green transition.",
+      "hidden_connection": "His sons (Sarang and Nikhil Gadkari) holding key directorships and substantial equity in the Purti Group (Purti Power & Sugar) and Manas Agro Industries, Vidarbha's dominant sugar, distillery, and ethanol-manufacturing conglomerates.",
+      "policy_nexus": "Manifesto and ministerial programs establishing mandatory green biofuel purchase guidelines, directly multiplying the corporate revenues of family-held agro-distillery cartels.",
+      "citizen_risk_score": 8.9
+    }
+  ]
+}

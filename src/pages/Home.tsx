@@ -1,20 +1,91 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, AlertTriangle, TrendingUp, Users, ShieldAlert, BadgeAlert, Newspaper, ChevronRight, MapPin, Building2, ShieldCheck, Scale, Globe, ArrowRight, Sparkles } from 'lucide-react';
+import {
+  Search, AlertTriangle, TrendingUp, Users, ShieldAlert, BadgeAlert,
+  Newspaper, ChevronRight, MapPin, Building2, ShieldCheck, Scale,
+  Globe, ArrowRight, Sparkles, BarChart3, GitCompare, Star,
+  FileText, Clock, Zap, Eye
+} from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { PoliticianCard } from '../components/ui/PoliticianCard';
 import { usePoliticians } from '../hooks/usePoliticians';
+import { useI18n } from '../i18n/translations';
 
-const WorkAreas = [
-  { level: 'National', roles: ['Prime Minister', 'Union Cabinet Ministers', 'Ministers of State', 'Rajya Sabha MPs', 'Lok Sabha MPs'] },
-  { level: 'State', roles: ['Chief Ministers', 'State Cabinet Ministers', 'MLAs', 'MLCs', 'Speakers'] },
-  { level: 'Local / District', roles: ['Mayors', 'Deputy Mayors', 'Municipal Councillors', 'Zila Panchayat'] },
-  { level: 'Grassroots', roles: ['Block Pramukh', 'Gram Panchayat Sarpanch', 'Ward Member'] },
+const PLATFORM_FEATURES = [
+  {
+    icon: ShieldAlert,
+    title: 'Criminal Record Tracker',
+    desc: 'Real-time tracking of FIRs, chargesheets, and court dates from ECI affidavits.',
+    color: 'text-danger-red',
+    bg: 'glass-danger',
+  },
+  {
+    icon: TrendingUp,
+    title: 'Wealth Growth Monitor',
+    desc: 'Cross-election asset comparison using sworn declaration data.',
+    color: 'text-warning-amber',
+    bg: '',
+  },
+  {
+    icon: BarChart3,
+    title: 'Parliament Performance',
+    desc: 'Attendance, debates, questions & bills data from PRS Legislative Research.',
+    color: 'text-info-blue',
+    bg: '',
+  },
+  {
+    icon: GitCompare,
+    title: 'Side-by-Side Compare',
+    desc: 'Compare any two politicians across 20+ integrity metrics simultaneously.',
+    color: 'text-success-green',
+    bg: 'glass-success',
+  },
+  {
+    icon: Sparkles,
+    title: 'Democracy Match Quiz',
+    desc: 'Find which politician\'s track record aligns with your civic priorities.',
+    color: 'text-accent-gold',
+    bg: '',
+  },
+  {
+    icon: MapPin,
+    title: 'Constituency Finder',
+    desc: 'Enter your PIN code to instantly discover your MP, MLA, and Corporator.',
+    color: 'text-purple',
+    bg: '',
+  },
+];
+
+const GOVERNANCE_LEVELS = [
+  {
+    level: 'National',
+    icon: '🇮🇳',
+    roles: ['Prime Minister', 'Union Cabinet Ministers', 'Ministers of State', 'Rajya Sabha MPs', 'Lok Sabha MPs'],
+    badge: 'Central Govt',
+  },
+  {
+    level: 'State',
+    icon: '🏛️',
+    roles: ['Chief Ministers', 'State Cabinet Ministers', 'MLAs', 'MLCs', 'Speakers'],
+    badge: 'State Govt',
+  },
+  {
+    level: 'Local / District',
+    icon: '🏙️',
+    roles: ['Mayors', 'Deputy Mayors', 'Municipal Councillors', 'Zila Panchayat'],
+    badge: 'Urban Bodies',
+  },
+  {
+    level: 'Grassroots',
+    icon: '🌾',
+    roles: ['Block Pramukh', 'Gram Panchayat Sarpanch', 'Ward Member'],
+    badge: 'Panchayati Raj',
+  },
 ];
 
 const Home = () => {
+  const { t } = useI18n();
   const { data: politicians = [], isLoading } = usePoliticians();
-  
   const [searchPincode, setSearchPincode] = useState('');
   const [funnelResults, setFunnelResults] = useState<{
     mp: any | null;
@@ -24,30 +95,44 @@ const Home = () => {
   } | null>(null);
   const [funnelError, setFunnelError] = useState('');
   const [isLocating, setIsLocating] = useState(false);
+  const [heroCount, setHeroCount] = useState(0);
+
+  // Animate counter on load
+  useEffect(() => {
+    if (!isLoading && politicians.length > 0) {
+      let start = 0;
+      const end = politicians.length;
+      const step = Math.ceil(end / 40);
+      const timer = setInterval(() => {
+        start += step;
+        if (start >= end) {
+          setHeroCount(end);
+          clearInterval(timer);
+        } else {
+          setHeroCount(start);
+        }
+      }, 30);
+      return () => clearInterval(timer);
+    }
+  }, [isLoading, politicians.length]);
 
   const handlePincodeSearch = (pincode: string) => {
     const trimmed = pincode.trim();
     if (trimmed.length !== 6 || !/^\d+$/.test(trimmed)) {
-      setFunnelError('Please enter a valid 6-digit Indian PIN Code.');
+      setFunnelError(t('pin_error'));
       setFunnelResults(null);
       return;
     }
-
     setFunnelError('');
-    
-    // Filter candidates matching the PIN code
     const matches = politicians.filter(p => p.pincodes?.includes(trimmed));
-
     if (matches.length === 0) {
-      setFunnelError(`No ballot candidates indexed for PIN Code ${trimmed}. Try searching for 560001, 233001, or 400001.`);
+      setFunnelError(t('pin_not_found'));
       setFunnelResults(null);
       return;
     }
-
-    const mp = matches.find(p => p.role.includes('MP')) || null;
+    const mp = matches.find(p => p.role.toLowerCase().includes('mp') || p.role.toLowerCase().includes('lok sabha') || p.role.toLowerCase().includes('rajya sabha')) || null;
     const mla = matches.find(p => p.role === 'MLA') || null;
     const corporator = matches.find(p => p.role === 'Corporator') || null;
-
     setFunnelResults({ mp, mla, corporator, pincode: trimmed });
   };
 
@@ -56,438 +141,399 @@ const Home = () => {
     setFunnelError('');
     setTimeout(() => {
       setIsLocating(false);
-      // Simulate matching to Bangalore Central 560001
       setSearchPincode('560001');
       handlePincodeSearch('560001');
-    }, 1200);
+    }, 1500);
   };
 
-  // Extract all news articles and sort them by date descending
   const recentArticles = useMemo(() => {
-    const articles = politicians.flatMap(p => 
+    const articles = politicians.flatMap(p =>
       (p.newsArticles || []).map(art => ({
         ...art,
         politicianId: p.id,
         politicianName: p.name,
-        politicianParty: p.party
+        politicianParty: p.party,
       }))
     );
-    // Sort by date descending
     return articles.sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
   }, [politicians]);
 
-  // Dynamically select riskiest politicians for "Recently Flagged"
   const recentlyFlagged = useMemo(() => {
-    return [...politicians]
-      .sort((a, b) => a.aiScore - b.aiScore) // Riskiest first
-      .slice(0, 4);
+    return [...politicians].sort((a, b) => a.aiScore - b.aiScore).slice(0, 4);
   }, [politicians]);
 
-  // Derive dynamic stats from parsed ECI records
   const stats = useMemo(() => {
     const totalTracked = politicians.length;
     const totalCases = politicians.reduce((acc, p) => acc + (p.criminalCases || 0), 0);
-    
-    // Average Net Worth Growth percentage
-    const growthValues = politicians
-      .map(p => p.netWorthGrowth)
-      .filter(g => typeof g === 'number' && g >= 0);
-    
-    const avgGrowth = growthValues.length > 0 
-      ? Math.round(growthValues.reduce((acc, g) => acc + g, 0) / growthValues.length) 
+    const growthValues = politicians.map(p => p.netWorthGrowth).filter(g => typeof g === 'number' && g >= 0);
+    const avgGrowth = growthValues.length > 0
+      ? Math.round(growthValues.reduce((acc, g) => acc + g, 0) / growthValues.length)
       : 20;
-
-    // Scan for flagged markers
     const scamLinked = politicians.filter(p => {
       const f = p.flags || {};
       return f.offshoreLink || f.cronyism || f.edRaid || f.convicted;
     }).length;
-
-    return {
-      totalTracked,
-      totalCases,
-      avgGrowth,
-      scamLinked
-    };
+    return { totalTracked, totalCases, avgGrowth, scamLinked };
   }, [politicians]);
+
+  const STAT_ITEMS = [
+    { value: isLoading ? '...' : `${heroCount}+`, label: t('stat_tracked'), color: 'text-text-primary', sub: t('stat_live') },
+    { value: isLoading ? '...' : String(stats.totalCases), label: t('stat_cases'), color: 'text-danger-red', sub: t('stat_pending') },
+    { value: isLoading ? '...' : `${stats.avgGrowth}%`, label: t('stat_growth'), color: 'text-warning-amber', sub: t('stat_per_term') },
+    { value: isLoading ? '...' : String(stats.scamLinked), label: t('stat_flagged'), color: 'text-accent-gold', sub: t('stat_politicians') },
+  ];
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden border-b border-border-subtle bg-bg-secondary pt-16 pb-20 lg:pt-24 lg:pb-28">
-        <div className="absolute inset-0 z-0 opacity-10 pointer-events-none flex items-center justify-center">
-          {/* Abstract India Map SVG placeholder */}
-          <svg viewBox="0 0 100 100" className="w-[800px] h-[800px] fill-current text-accent-gold">
-            <path d="M50 0 L100 50 L50 100 L0 50 Z" />
-          </svg>
+
+      {/* ══════════════════════════════════════════
+          HERO SECTION
+      ══════════════════════════════════════════ */}
+      <section className="relative overflow-hidden py-20 lg:py-32">
+        {/* Background decorative elements */}
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[400px] rounded-full opacity-20"
+            style={{ background: 'radial-gradient(ellipse, rgba(99,102,241,0.15) 0%, transparent 70%)' }} />
+          <div className="absolute top-20 left-0 w-96 h-96 rounded-full opacity-10"
+            style={{ background: 'radial-gradient(circle, rgba(232,160,32,0.2) 0%, transparent 70%)' }} />
+          <div className="absolute bottom-0 right-0 w-72 h-72 rounded-full opacity-8"
+            style={{ background: 'radial-gradient(circle, rgba(16,185,129,0.15) 0%, transparent 70%)' }} />
+          {/* India Tricolor dots */}
+          <div className="absolute top-10 right-10 opacity-5 font-mono text-[200px] select-none">🇮🇳</div>
         </div>
-        
+
         <div className="container relative z-10 mx-auto px-4 text-center">
-          <BadgeAlert className="mx-auto mb-6 text-accent-gold" size={48} />
-          <h1 className="font-heading text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 text-text-primary">
-            Know Your Representatives.<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-gold to-warning-amber">Hold Power Accountable.</span>
+          {/* Eyebrow tag */}
+          <div className="inline-flex items-center gap-2 glass-panel rounded-full px-4 py-1.5 mb-6 border border-border-medium">
+            <span className="live-dot" />
+            <span className="text-xs font-mono text-success-green uppercase tracking-widest">{t('hero_badge')}</span>
+          </div>
+
+          {/* Hero headline */}
+          <h1 className="font-heading text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight mb-6 leading-none">
+            <span className="text-text-primary block">{t('hero_title_1')}</span>
+            <span className="gradient-text-hero block">{t('hero_title_2')}</span>
           </h1>
-          <p className="max-w-2xl mx-auto text-lg md:text-xl text-text-secondary mb-8 font-sans">
-            Transparent, data-driven insights on every MP, MLA, Minister, Sarpanch, and Mayor across India.
-          </p>
           
-          {/* Location Funnel Search Box */}
-          <div className="max-w-3xl mx-auto glass-panel p-6 rounded-2xl shadow-xl space-y-6 text-left mb-10">
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-              <div className="space-y-1">
-                <h3 className="font-heading font-bold text-sm text-text-primary uppercase tracking-wider flex items-center gap-1.5">
-                  <MapPin size={16} className="text-accent-gold" /> Discover Your Local Representatives
+          <p className="max-w-2xl mx-auto text-base md:text-lg text-text-secondary mb-10 font-sans leading-relaxed">
+            {t('hero_subtitle')}
+          </p>
+
+          {/* ── PIN Code Finder ── */}
+          <div className="max-w-3xl mx-auto glass-elevated p-6 rounded-2xl shadow-2xl space-y-5 text-left mb-10">
+            <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+              <div>
+                <h3 className="font-heading font-bold text-sm text-text-primary flex items-center gap-2 mb-1">
+                  <MapPin size={16} className="text-accent-gold" />
+                  {t('pin_title')}
                 </h3>
-                <p className="text-[10px] text-text-secondary font-sans leading-normal">
-                  Enter your 6-digit Indian PIN Code or use current location to see your exact ballot MP, MLA, and Corporator.
+                <p className="text-xs text-text-secondary font-sans">
+                  {t('pin_subtitle')}
                 </p>
               </div>
-              
-              <div className="w-full md:w-auto flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
-                <div className="flex items-center gap-2 bg-bg-card border border-border-subtle px-3 py-2 rounded-lg text-xs font-mono w-full sm:w-52">
-                  <input 
-                    type="text" 
+
+              <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+                <div className="flex items-center gap-2 bg-bg-primary border border-border-medium px-3 py-2.5 rounded-xl text-sm font-mono w-full sm:w-44 focus-within:border-accent-gold/50 transition-colors">
+                  <MapPin size={14} className="text-text-muted shrink-0" />
+                  <input
+                    type="text"
                     maxLength={6}
-                    placeholder="Enter PIN (e.g. 560001)"
+                    inputMode="numeric"
+                    placeholder="e.g. 560001"
                     value={searchPincode}
                     onChange={(e) => setSearchPincode(e.target.value.replace(/\D/g, ''))}
-                    className="bg-transparent border-none outline-none w-full text-text-primary placeholder:text-text-secondary"
+                    onKeyDown={(e) => e.key === 'Enter' && handlePincodeSearch(searchPincode)}
+                    className="bg-transparent border-none outline-none w-full text-text-primary placeholder:text-text-muted text-sm"
                   />
                 </div>
-                
-                <Button 
+                <button
                   onClick={() => handlePincodeSearch(searchPincode)}
-                  className="bg-accent-gold hover:bg-accent-gold/80 text-bg-primary font-bold font-mono text-xs px-5 py-2.5 rounded shrink-0 shadow"
+                  className="bg-accent-gold hover:bg-accent-gold/85 text-bg-primary font-bold font-mono text-xs px-5 py-2.5 rounded-xl shrink-0 shadow-lg press-effect transition-all"
+                  id="pin-search-btn"
                 >
-                  FIND BALLOT
-                </Button>
-                
-                <Button 
+                  {t('pin_cta')}
+                </button>
+                <button
                   onClick={handleLiveGeolocation}
-                  variant="outline"
-                  className="font-mono text-xs px-4 py-2.5 rounded shrink-0 border-border-subtle hover:bg-bg-card text-text-primary flex items-center justify-center gap-1.5"
+                  className="flex items-center justify-center gap-1.5 font-mono text-xs px-4 py-2.5 rounded-xl shrink-0 border border-border-medium hover:bg-bg-elevated text-text-primary press-effect transition-all"
                 >
                   {isLocating ? (
-                    <>
-                      <div className="w-3.5 h-3.5 border-2 border-accent-gold/20 border-t-accent-gold rounded-full animate-spin"></div>
-                      LOCATING...
-                    </>
+                    <><div className="w-3.5 h-3.5 border-2 border-info-blue/30 border-t-info-blue rounded-full animate-spin" /> {t('pin_locating')}</>
                   ) : (
-                    <>
-                      <Globe size={12} className="text-info-blue" /> USE GPS
-                    </>
+                    <><Globe size={13} className="text-info-blue" /> {t('pin_gps')}</>
                   )}
-                </Button>
+                </button>
               </div>
             </div>
 
-            {/* Error alerts */}
+            {/* Error */}
             {funnelError && (
-              <div className="bg-danger-red/10 border border-danger-red/20 rounded-lg p-3 text-danger-red font-mono text-[10px] flex items-center gap-2">
+              <div className="glass-danger rounded-xl p-3 text-danger-red font-mono text-xs flex items-center gap-2">
                 <AlertTriangle size={14} className="shrink-0" />
-                <span>{funnelError}</span>
+                {funnelError}
               </div>
             )}
 
-            {/* Location Funnel Results Grid */}
+            {/* Results */}
             {funnelResults && (
-              <div className="space-y-5 pt-4 border-t border-border-subtle/50">
-                <div className="flex items-center justify-between gap-4">
-                  <div className="font-mono text-xs font-bold text-accent-gold flex items-center gap-1.5">
-                    <ShieldCheck size={16} /> BALLOT LEDGER FOR PIN CODE: {funnelResults.pincode}
+              <div className="pt-4 border-t border-border-subtle space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 font-mono text-xs font-bold text-accent-gold">
+                    <ShieldCheck size={14} /> {t('pin_ballot')} {funnelResults.pincode}
                   </div>
-                  <button 
-                    onClick={() => {
-                      setFunnelResults(null);
-                      setSearchPincode('');
-                    }}
-                    className="font-mono text-[10px] text-text-secondary hover:text-text-primary underline"
+                  <button
+                    onClick={() => { setFunnelResults(null); setSearchPincode(''); }}
+                    className="font-mono text-[10px] text-text-muted hover:text-text-secondary underline transition-colors"
                   >
-                    RESET SEARCH
+                    {t('pin_clear')}
                   </button>
                 </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  
-                  {/* MP Tier Card */}
-                  <div className="glass-panel hover-glow p-4 rounded-xl flex flex-col justify-between h-full space-y-4">
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[9px] font-mono font-bold text-text-secondary uppercase">1. National (MP)</span>
-                        {funnelResults.mp && (
-                          <span className={`text-[8px] font-mono font-bold px-1.5 py-0.5 border rounded uppercase ${
-                            funnelResults.mp.aiScore >= 70 ? 'text-success-green bg-success-green/5 border-success-green/10' :
-                            funnelResults.mp.aiScore >= 40 ? 'text-warning-amber bg-warning-amber/5 border-warning-amber/10' :
-                            'text-danger-red bg-danger-red/5 border-danger-red/10'
-                          }`}>
-                            AI Score: {funnelResults.mp.aiScore}
-                          </span>
-                        )}
-                      </div>
-                      
-                      {funnelResults.mp ? (
-                        <div className="flex gap-3 items-center text-left">
-                          <img src={funnelResults.mp.photoUrl} alt={funnelResults.mp.name} className="w-10 h-10 object-cover rounded-lg border border-border-subtle shrink-0" referrerPolicy="no-referrer" />
-                          <div className="min-w-0">
-                            <h4 className="font-heading font-bold text-sm text-text-primary tracking-wide truncate">{funnelResults.mp.name}</h4>
-                            <p className="text-[10px] text-text-secondary font-mono truncate">{funnelResults.mp.party} • {funnelResults.mp.constituency}</p>
-                          </div>
-                        </div>
-                      ) : (
-                        <p className="text-[10px] text-text-secondary font-sans leading-relaxed">No active Parliamentary MP matching this geographic quadrant in local indices.</p>
-                      )}
-                    </div>
-                    {funnelResults.mp && (
-                      <Link to={`/politician/${funnelResults.mp.id}`} className="pt-2">
-                        <button className="w-full bg-bg-secondary border border-border-subtle hover:bg-bg-card font-mono text-[9px] py-1.5 rounded text-accent-gold font-bold flex items-center justify-center gap-1">
-                          VIEW MP DOSSIER <ArrowRight size={10} />
-                        </button>
-                      </Link>
-                    )}
-                  </div>
-
-                  {/* MLA Tier Card */}
-                  <div className="glass-panel hover-glow p-4 rounded-xl flex flex-col justify-between h-full space-y-4">
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[9px] font-mono font-bold text-text-secondary uppercase">2. State Assembly (MLA)</span>
-                        {funnelResults.mla && (
-                          <span className={`text-[8px] font-mono font-bold px-1.5 py-0.5 border rounded uppercase ${
-                            funnelResults.mla.aiScore >= 70 ? 'text-success-green bg-success-green/5 border-success-green/10' :
-                            funnelResults.mla.aiScore >= 40 ? 'text-warning-amber bg-warning-amber/5 border-warning-amber/10' :
-                            'text-danger-red bg-danger-red/5 border-danger-red/10'
-                          }`}>
-                            AI Score: {funnelResults.mla.aiScore}
-                          </span>
-                        )}
-                      </div>
-                      
-                      {funnelResults.mla ? (
-                        <div className="flex gap-3 items-center text-left">
-                          <img src={funnelResults.mla.photoUrl} alt={funnelResults.mla.name} className="w-10 h-10 object-cover rounded-lg border border-border-subtle shrink-0" referrerPolicy="no-referrer" />
-                          <div className="min-w-0">
-                            <h4 className="font-heading font-bold text-sm text-text-primary tracking-wide truncate">{funnelResults.mla.name}</h4>
-                            <p className="text-[10px] text-text-secondary font-mono truncate">{funnelResults.mla.party} • {funnelResults.mla.constituency}</p>
-                          </div>
-                        </div>
-                      ) : (
-                        <p className="text-[10px] text-text-secondary font-sans leading-relaxed">No active Assembly MLA matching this geographic quadrant in local indices.</p>
-                      )}
-                    </div>
-                    {funnelResults.mla && (
-                      <Link to={`/politician/${funnelResults.mla.id}`} className="pt-2">
-                        <button className="w-full bg-bg-secondary border border-border-subtle hover:bg-bg-card font-mono text-[9px] py-1.5 rounded text-accent-gold font-bold flex items-center justify-center gap-1">
-                          VIEW MLA DOSSIER <ArrowRight size={10} />
-                        </button>
-                      </Link>
-                    )}
-                  </div>
-
-                  {/* Local Corporator Tier Card */}
-                  <div className="glass-panel hover-glow p-4 rounded-xl flex flex-col justify-between h-full space-y-4">
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[9px] font-mono font-bold text-text-secondary uppercase">3. Local Municipal (Corporator)</span>
-                        {funnelResults.corporator && (
-                          <span className={`text-[8px] font-mono font-bold px-1.5 py-0.5 border rounded uppercase ${
-                            funnelResults.corporator.aiScore >= 70 ? 'text-success-green bg-success-green/5 border-success-green/10' :
-                            funnelResults.corporator.aiScore >= 40 ? 'text-warning-amber bg-warning-amber/5 border-warning-amber/10' :
-                            'text-danger-red bg-danger-red/5 border-danger-red/10'
-                          }`}>
-                            AI Score: {funnelResults.corporator.aiScore}
-                          </span>
-                        )}
-                      </div>
-                      
-                      {funnelResults.corporator ? (
-                        <div className="space-y-2">
-                          <div className="flex gap-3 items-center text-left">
-                            <img src={funnelResults.corporator.photoUrl} alt={funnelResults.corporator.name} className="w-10 h-10 object-cover rounded-lg border border-border-subtle shrink-0" referrerPolicy="no-referrer" />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {[
+                    { tier: t('pin_mp'), data: funnelResults.mp, label: t('pin_view') },
+                    { tier: t('pin_mla'), data: funnelResults.mla, label: t('pin_view') },
+                    { tier: t('pin_corp'), data: funnelResults.corporator, label: t('pin_view') },
+                  ].map(({ tier, data: rep, label }) => (
+                    <div key={tier} className="glass-panel rounded-xl p-3.5 space-y-3">
+                      <span className="text-[9px] font-mono font-bold text-text-muted uppercase tracking-widest">{tier}</span>
+                      {rep ? (
+                        <>
+                          <div className="flex items-center gap-3">
+                            <img src={rep.photoUrl} alt={rep.name}
+                              className="w-9 h-9 rounded-lg object-cover object-top border border-border-subtle shrink-0"
+                              referrerPolicy="no-referrer" />
                             <div className="min-w-0">
-                              <h4 className="font-heading font-bold text-sm text-text-primary tracking-wide truncate">{funnelResults.corporator.name}</h4>
-                              <p className="text-[10px] text-text-secondary font-mono truncate">{funnelResults.corporator.municipalWard ?? 'Ward Member'}</p>
+                              <p className="font-heading font-bold text-sm text-text-primary truncate">{rep.name}</p>
+                              <p className="text-[10px] text-text-secondary font-mono truncate">{rep.party} • {rep.constituency || rep.state}</p>
                             </div>
                           </div>
-                          <div className="grid grid-cols-2 gap-2 text-[8px] font-mono border-t border-border-subtle/50 pt-2 text-left">
-                            <div>
-                              <span className="text-text-secondary block">WARD FUND SPENT:</span>
-                              <span className="text-success-green font-bold">{funnelResults.corporator.localWardFundUtilization}%</span>
-                            </div>
-                            <div>
-                              <span className="text-text-secondary block">GRIEVANCE REDRESSED:</span>
-                              <span className="text-info-blue font-bold">{funnelResults.corporator.grievanceRedressPct}%</span>
-                            </div>
+                          <div className="flex items-center justify-between">
+                            <span className={`text-[9px] font-mono font-black px-2 py-0.5 rounded-full border ${
+                              rep.aiScore >= 70 ? 'tag-success' : rep.aiScore >= 40 ? 'tag-warning' : 'tag-danger'
+                            }`}>
+                              SCORE: {rep.aiScore}/100
+                            </span>
+                            <Link to={`/politician/${rep.id}`}
+                              className="text-[9px] font-mono text-accent-gold hover:text-text-primary flex items-center gap-0.5 transition-colors">
+                              {label} <ArrowRight size={9} />
+                            </Link>
                           </div>
-                        </div>
+                        </>
                       ) : (
-                        <p className="text-[10px] text-text-secondary font-sans leading-relaxed">No active Ward Corporator matching this geographic quadrant in local indices.</p>
+                        <p className="text-[10px] text-text-muted font-sans leading-relaxed">
+                          {t('pin_not_found')}
+                        </p>
                       )}
                     </div>
-                    {funnelResults.corporator && (
-                      <Link to={`/politician/${funnelResults.corporator.id}`} className="pt-2">
-                        <button className="w-full bg-bg-secondary border border-border-subtle hover:bg-bg-card font-mono text-[9px] py-1.5 rounded text-accent-gold font-bold flex items-center justify-center gap-1">
-                          VIEW WARD DOSSIER <ArrowRight size={10} />
-                        </button>
-                      </Link>
-                    )}
-                  </div>
-
+                  ))}
                 </div>
               </div>
             )}
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-16">
             <Link to="/democracy-match" className="w-full sm:w-auto">
-              <Button size="lg" className="w-full font-bold bg-accent-gold text-bg-primary hover:bg-accent-gold/80 flex items-center justify-center gap-1.5 shadow-md">
-                <Sparkles className="h-5 w-5 animate-pulse" /> START DEMOCRACY MATCH QUIZ
-              </Button>
+              <button className="w-full flex items-center justify-center gap-2 bg-accent-gold hover:bg-accent-gold/85 text-bg-primary font-bold font-heading text-sm px-8 py-3.5 rounded-xl shadow-lg press-effect transition-all">
+                <Sparkles size={18} className="animate-pulse" />
+                {t('section_cta').toUpperCase()}
+              </button>
             </Link>
             <Link to="/search" className="w-full sm:w-auto">
-              <Button size="lg" variant="outline" className="w-full text-text-primary hover:bg-bg-card">
-                <Search className="mr-2 h-5 w-5" /> Search a Politician
-              </Button>
+              <button className="w-full flex items-center justify-center gap-2 glass-panel hover:bg-bg-elevated text-text-primary font-medium text-sm px-8 py-3.5 rounded-xl border border-border-medium press-effect transition-all">
+                <Search size={16} />
+                {t('nav_search')}
+              </button>
             </Link>
             <Link to="/browse" className="w-full sm:w-auto">
-              <Button size="lg" variant="secondary" className="w-full bg-bg-card border border-border-subtle text-info-blue hover:bg-bg-primary">
-                Browse State Index
-              </Button>
+              <button className="w-full flex items-center justify-center gap-2 glass-panel hover:bg-bg-elevated text-info-blue font-medium text-sm px-8 py-3.5 rounded-xl border border-info-blue/20 press-effect transition-all">
+                {t('nav_browse')}
+              </button>
             </Link>
           </div>
 
-          <div className="mt-16 glass-panel rounded-2xl p-6 grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="flex flex-col items-center">
-              <span className="text-3xl font-mono font-bold text-text-primary">
-                {isLoading ? '...' : `${stats.totalTracked}+`}
-              </span>
-              <span className="text-xs uppercase tracking-wider text-text-secondary mt-1">Politicians Tracked</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <span className="text-3xl font-mono font-bold text-danger-red">
-                {isLoading ? '...' : stats.totalCases}
-              </span>
-              <span className="text-xs uppercase tracking-wider text-text-secondary mt-1">Cases Pending</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <span className="text-3xl font-mono font-bold text-warning-amber">
-                {isLoading ? '...' : `${stats.avgGrowth}%`}
-              </span>
-              <span className="text-xs uppercase tracking-wider text-text-secondary mt-1">Avg Asset Growth</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <span className="text-3xl font-mono font-bold text-accent-gold">
-                {isLoading ? '...' : stats.scamLinked}
-              </span>
-              <span className="text-xs uppercase tracking-wider text-text-secondary mt-1">Scam Linked</span>
-            </div>
+          {/* ── Live Stats Bar ── */}
+          <div className="glass-panel rounded-2xl p-5 grid grid-cols-2 md:grid-cols-4 gap-4 border border-border-medium">
+            {STAT_ITEMS.map(({ value, label, color, sub }) => (
+              <div key={label} className="flex flex-col items-center py-2">
+                <span className={`text-3xl md:text-4xl font-mono font-black ${color}`}>{value}</span>
+                <span className="text-xs font-heading font-semibold text-text-primary mt-1">{label}</span>
+                <span className="text-[10px] text-text-muted font-mono mt-0.5">{sub}</span>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Ticker */}
-      <div className="bg-bg-card border-b border-border-subtle overflow-hidden flex whitespace-nowrap py-3">
-        <div className="animate-marquee flex items-center gap-8 font-mono text-sm text-text-secondary">
-          <span className="flex items-center text-danger-red"><AlertTriangle size={14} className="mr-1"/> {isLoading ? '...' : stats.totalCases} pending criminal cases tracked</span>
-          <span className="flex items-center"><TrendingUp size={14} className="mr-1"/> {isLoading ? '...' : `${stats.avgGrowth}%`} average net worth growth per term</span>
-          <span className="flex items-center text-warning-amber"><AlertTriangle size={14} className="mr-1"/> {isLoading ? '...' : stats.scamLinked} politicians with active wealth discrepancy tags</span>
-          <span className="flex items-center text-success-green"><Users size={14} className="mr-1"/> 100% independent civic transparency registry</span>
-          {/* Duplicate for infinite loop illusion */}
-          <span className="flex items-center text-danger-red"><AlertTriangle size={14} className="mr-1"/> {isLoading ? '...' : stats.totalCases} pending criminal cases tracked</span>
+      {/* ══════════════════════════════════════════
+          NEWS TICKER
+      ══════════════════════════════════════════ */}
+      <div className="border-y border-border-subtle overflow-hidden relative">
+        <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-bg-primary to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-bg-primary to-transparent z-10 pointer-events-none" />
+        <div className="ticker-track flex items-center gap-10 py-3 font-mono text-[11px] text-text-secondary whitespace-nowrap">
+          <span className="flex items-center gap-1.5 text-danger-red">
+            <AlertTriangle size={12} /> {isLoading ? '...' : stats.totalCases} pending criminal cases tracked
+          </span>
+          <span className="text-border-subtle">•</span>
+          <span className="flex items-center gap-1.5">
+            <TrendingUp size={12} className="text-warning-amber" /> Average asset growth {isLoading ? '...' : `${stats.avgGrowth}%`} per term
+          </span>
+          <span className="text-border-subtle">•</span>
+          <span className="flex items-center gap-1.5 text-warning-amber">
+            <BadgeAlert size={12} /> {isLoading ? '...' : stats.scamLinked} politicians with active wealth discrepancy flags
+          </span>
+          <span className="text-border-subtle">•</span>
+          <span className="flex items-center gap-1.5 text-success-green">
+            <ShieldCheck size={12} /> 100% independent civic transparency registry — no political affiliations
+          </span>
+          <span className="text-border-subtle">•</span>
+          <span className="flex items-center gap-1.5">
+            <Users size={12} className="text-info-blue" /> {isLoading ? '...' : `${politicians.length}+`} politicians tracked across all states
+          </span>
+          <span className="text-border-subtle">•</span>
+          {/* Duplicate for seamless loop */}
+          <span className="flex items-center gap-1.5 text-danger-red">
+            <AlertTriangle size={12} /> {isLoading ? '...' : stats.totalCases} pending criminal cases tracked
+          </span>
+          <span className="text-border-subtle">•</span>
+          <span className="flex items-center gap-1.5">
+            <TrendingUp size={12} className="text-warning-amber" /> Average asset growth {isLoading ? '...' : `${stats.avgGrowth}%`} per term
+          </span>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-16 space-y-20">
-        
-        {/* Top Sections */}
-        <section>
-          <div className="flex justify-between items-end mb-8 border-b border-border-subtle pb-4">
+      {/* ══════════════════════════════════════════
+          MAIN CONTENT SECTIONS
+      ══════════════════════════════════════════ */}
+      <div className="container mx-auto px-4 py-16 space-y-24">
+
+        {/* ── Recently Flagged Politicians ── */}
+        <section className="section-enter">
+          <div className="flex justify-between items-end mb-8">
             <div>
-              <h2 className="text-2xl font-heading font-bold text-text-primary">Recently Flagged</h2>
-              <p className="text-text-secondary text-sm mt-1">Politicians with new FIRs, ED raids, or EC notices</p>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="tag-danger flex items-center gap-1"><AlertTriangle size={10} /> HIGH RISK</span>
+              </div>
+              <h2 className="text-2xl md:text-3xl font-heading font-black text-text-primary">
+                {t('section_flagged')}
+              </h2>
+              <p className="text-text-secondary text-sm mt-1.5">
+                {t('section_flagged_sub')}
+              </p>
             </div>
             <Link to="/rankings">
-              <Button variant="link" className="text-info-blue">
-                View All Reports
-              </Button>
+              <button className="hidden sm:flex items-center gap-1.5 text-sm font-mono text-info-blue hover:text-text-primary border border-border-subtle hover:border-info-blue/30 px-4 py-2 rounded-lg transition-all">
+                {t('view_all')} <ChevronRight size={14} />
+              </button>
             </Link>
           </div>
-          
+
           {isLoading ? (
-            <div className="h-64 flex flex-col items-center justify-center text-center p-8 space-y-4">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent-gold"></div>
-              <h3 className="font-heading text-lg font-bold text-text-secondary">LOADING TELEMETRY DATA...</h3>
+            <div className="h-64 flex flex-col items-center justify-center gap-4">
+              <div className="w-10 h-10 border-4 border-accent-gold/20 border-t-accent-gold rounded-full animate-spin" />
+              <p className="font-mono text-sm text-text-secondary animate-pulse">{t('loading')}</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {recentlyFlagged.map(politician => (
-                <PoliticianCard key={politician.id} data={politician} />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {recentlyFlagged.map((politician, idx) => (
+                <PoliticianCard key={politician.id} data={politician} rank={idx + 1} />
               ))}
             </div>
           )}
         </section>
 
-        {/* Breaking Transparency Scans */}
+        {/* ── Platform Features Grid ── */}
         <section>
-          <div className="flex justify-between items-end mb-8 border-b border-border-subtle pb-4">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 glass-panel rounded-full px-4 py-1.5 mb-4 border border-border-subtle">
+              <Zap size={12} className="text-accent-gold" />
+              <span className="text-xs font-mono text-text-secondary uppercase tracking-widest">Platform Capabilities</span>
+            </div>
+            <h2 className="text-2xl md:text-3xl font-heading font-black text-text-primary mb-3">
+              {t('section_features')}
+            </h2>
+            <p className="text-text-secondary max-w-xl mx-auto text-sm">
+              {t('section_features_sub')}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {PLATFORM_FEATURES.map(({ icon: Icon, title, desc, color, bg }) => (
+              <div key={title} className={`glass-panel hover-glow rounded-2xl p-6 border border-border-subtle group cursor-default`}>
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 ${bg || 'bg-bg-elevated'}`}>
+                  <Icon size={20} className={color} />
+                </div>
+                <h3 className="font-heading font-bold text-base text-text-primary mb-2 group-hover:text-accent-gold transition-colors">
+                  {title}
+                </h3>
+                <p className="text-text-secondary text-sm leading-relaxed">{desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ── Breaking Press Scans ── */}
+        <section>
+          <div className="flex justify-between items-end mb-8">
             <div>
-              <h2 className="text-2xl font-heading font-bold text-text-primary flex items-center gap-2">
-                <Newspaper className="text-accent-gold" size={24} />
-                BREAKING TRANSPARENCY PRESS SCANS
+              <div className="flex items-center gap-2 mb-2">
+                <span className="tag-info flex items-center gap-1"><Newspaper size={10} /> PRESS INTEL</span>
+              </div>
+              <h2 className="text-2xl md:text-3xl font-heading font-black text-text-primary">
+                {t('section_news')}
               </h2>
-              <p className="text-text-secondary text-sm mt-1">Live aggregated media disclosures, audits, and investigative journalism alerts</p>
+              <p className="text-text-secondary text-sm mt-1.5">
+                {t('section_news_sub')}
+              </p>
             </div>
           </div>
-          
+
           {isLoading ? (
-            <div className="h-64 flex flex-col items-center justify-center text-center p-8 space-y-4">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent-gold"></div>
-              <h3 className="font-heading text-lg font-bold text-text-secondary">SCANNING PRESS LEDGERS...</h3>
+            <div className="h-48 flex items-center justify-center">
+              <div className="w-8 h-8 border-4 border-info-blue/20 border-t-info-blue rounded-full animate-spin" />
             </div>
           ) : recentArticles.length === 0 ? (
-            <div className="bg-bg-secondary border border-border-subtle rounded-xl p-10 text-center text-text-secondary">
-              No press articles indexed in current directory scan.
+            <div className="glass-panel rounded-2xl p-12 text-center text-text-muted">
+              <Newspaper size={40} className="mx-auto mb-3 opacity-30" />
+              <p className="font-mono text-sm">No press articles indexed in current scan.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {recentArticles.map(article => {
                 const isCrit = article.sentiment === 'CRITICAL_ALLEGATION';
                 const isPos = article.sentiment === 'POSITIVE_OUTCOME';
-                
                 return (
-                  <div 
-                    key={article.id} 
-                    className="glass-panel hover-glow rounded-xl p-5 flex flex-col justify-between"
-                  >
+                  <div key={article.id} className="glass-panel hover-glow rounded-2xl p-5 flex flex-col justify-between border border-border-subtle">
                     <div className="space-y-3">
-                      <div className="flex justify-between items-center text-[10px] font-mono text-text-secondary">
-                        <span>{article.publisher.toUpperCase()} • {article.date}</span>
-                        <span className={`px-2 py-0.5 rounded font-bold uppercase ${
-                          isCrit ? 'bg-danger-red/10 text-danger-red border border-danger-red/20' :
-                          isPos ? 'bg-success-green/10 text-success-green border border-success-green/20' :
-                          'bg-bg-card text-text-secondary border border-border-subtle'
+                      <div className="flex justify-between items-start gap-2">
+                        <span className="text-[10px] font-mono text-text-muted">
+                          {article.publisher.toUpperCase()} • {article.date}
+                        </span>
+                        <span className={`shrink-0 ${
+                          isCrit ? 'tag-danger' : isPos ? 'tag-success' : 'tag-info'
                         }`}>
                           {article.sentiment.split('_')[0]}
                         </span>
                       </div>
-
                       <Link to={`/politician/${article.politicianId}`}>
-                        <h3 className="font-heading text-lg font-bold text-text-primary hover:text-accent-gold transition-colors leading-tight">
+                        <h3 className="font-heading text-base font-bold text-text-primary hover:text-accent-gold transition-colors leading-snug">
                           {article.title}
                         </h3>
                       </Link>
-
                       <p className="text-xs text-text-secondary leading-relaxed line-clamp-3">
                         {article.summary}
                       </p>
                     </div>
-
                     <div className="border-t border-border-subtle/50 pt-3 mt-4 flex items-center justify-between text-[11px] font-mono">
-                      <span className="text-text-secondary truncate pr-2">
-                        SUBJECT: <Link to={`/politician/${article.politicianId}`} className="text-text-primary font-bold hover:text-accent-gold">{article.politicianName} ({article.politicianParty})</Link>
+                      <span className="text-text-muted truncate pr-2">
+                        <Link to={`/politician/${article.politicianId}`} className="text-text-secondary font-bold hover:text-accent-gold">
+                          {article.politicianName}
+                        </Link>
+                        {' '}({article.politicianParty})
                       </span>
-                      <Link to={`/politician/${article.politicianId}`} className="text-accent-gold hover:text-text-primary flex items-center shrink-0">
-                        AUDIT &gt;
+                      <Link to={`/politician/${article.politicianId}`} className="text-accent-gold hover:text-warning-amber flex items-center gap-1 shrink-0 transition-colors">
+                        AUDIT <ChevronRight size={10} />
                       </Link>
                     </div>
                   </div>
@@ -497,19 +543,33 @@ const Home = () => {
           )}
         </section>
 
-        {/* Browse By Work Area */}
+        {/* ── Browse by Governance Level ── */}
         <section>
-          <h2 className="text-2xl font-heading font-bold text-text-primary mb-8 border-b border-border-subtle pb-4">Explore by Governance Level</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {WorkAreas.map((area, idx) => (
-              <div key={idx} className="glass-panel hover-glow rounded-xl p-6">
-                <h3 className="text-xl font-heading text-accent-gold mb-4 uppercase tracking-wider">{area.level}</h3>
-                <ul className="space-y-3">
-                  {area.roles.map((role, rIdx) => (
-                    <li key={rIdx}>
-                      <Link to={`/browse?role=${role}`} className="text-text-primary hover:text-info-blue text-sm font-medium transition-colors flex items-center">
-                        <span className="w-1.5 h-1.5 rounded-full bg-border-subtle mr-2 inline-block"></span>
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-heading font-black text-text-primary mb-3">
+              Explore by Governance Level
+            </h2>
+            <p className="text-text-secondary text-sm max-w-lg mx-auto">
+              From the Prime Minister to your local Gram Panchayat — track accountability at every tier of Indian democracy.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {GOVERNANCE_LEVELS.map((area) => (
+              <div key={area.level} className="glass-panel hover-glow-gold rounded-2xl p-6 border border-border-subtle group">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-3xl">{area.icon}</span>
+                  <span className="tag-gold text-[9px]">{area.badge}</span>
+                </div>
+                <h3 className="font-heading text-lg font-bold text-accent-gold mb-4">{area.level}</h3>
+                <ul className="space-y-2.5">
+                  {area.roles.map((role) => (
+                    <li key={role}>
+                      <Link
+                        to={`/browse?role=${role}`}
+                        className="text-sm text-text-secondary hover:text-text-primary transition-colors flex items-center gap-2 group/link"
+                      >
+                        <ChevronRight size={12} className="text-text-muted group-hover/link:text-accent-gold transition-colors shrink-0" />
                         {role}
                       </Link>
                     </li>
@@ -517,6 +577,25 @@ const Home = () => {
                 </ul>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* ── Call to Action Section ── */}
+        <section>
+          <div className="glass-gold rounded-3xl p-10 md:p-16 text-center border border-accent-gold/15">
+            <Star size={32} className="text-accent-gold mx-auto mb-4 animate-float" />
+            <h2 className="text-2xl md:text-4xl font-heading font-black text-text-primary mb-4">
+              Which politician best represents YOUR values?
+            </h2>
+            <p className="text-text-secondary max-w-lg mx-auto mb-8 text-sm leading-relaxed">
+              Take the Democracy Match Quiz — answer 10 civic questions and find out which politicians' actual track records align with what matters to you.
+            </p>
+            <Link to="/democracy-match">
+              <button className="inline-flex items-center gap-3 bg-accent-gold hover:bg-accent-gold/85 text-bg-primary font-black font-heading text-base px-10 py-4 rounded-2xl shadow-xl press-effect transition-all">
+                <Sparkles size={20} />
+                START DEMOCRACY MATCH
+              </button>
+            </Link>
           </div>
         </section>
 

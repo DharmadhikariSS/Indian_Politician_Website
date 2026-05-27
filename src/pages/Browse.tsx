@@ -25,6 +25,7 @@ import { IntegrityScoreGauge } from '../components/ui/IntegrityScoreGauge';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Card, CardContent } from '../components/ui/Card';
+import { useI18n } from '../i18n/translations';
 
 const getStandardizedRole = (param: string): string => {
   const lower = param.toLowerCase();
@@ -36,6 +37,7 @@ const getStandardizedRole = (param: string): string => {
 };
 
 const Browse = () => {
+  const { t } = useI18n();
   const { data: politicians = [], isLoading } = usePoliticians();
   const [searchParams, setSearchParams] = useSearchParams();
   const initialRoleParam = searchParams.get('role') || 'all';
@@ -240,47 +242,45 @@ const Browse = () => {
   }, [selectedId, politicians]);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-64px)] overflow-hidden">
+    <div className="flex flex-col" style={{ height: 'calc(100dvh - 110px)' }}>
       {/* Search Header Banner */}
-      <div className="bg-bg-secondary border-b border-border-subtle p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
+      <div className="bg-bg-secondary border-b border-border-subtle px-4 py-3 flex flex-col md:flex-row md:items-center justify-between gap-3 shrink-0">
         <div>
-          <h1 className="text-xl md:text-2xl font-heading font-bold text-text-primary flex items-center gap-2">
-            <SlidersHorizontal size={20} className="text-accent-gold" />
-            VOTER DECISION HUB • TELEMETRY CENTER
+          <h1 className="text-lg md:text-xl font-heading font-bold text-text-primary flex items-center gap-2">
+            <SlidersHorizontal size={18} className="text-accent-gold" />
+            Voter Decision Hub
+            <span className="tag-gold ml-1">LIVE</span>
           </h1>
-          <p className="text-xs text-text-secondary">
-            Live sorting and analytical assessment framework for {politicians.length} indexed public representatives.
+          <p className="text-xs text-text-muted mt-0.5 font-mono">
+            {politicians.length} {t('stat_tracked')} · {filteredPoliticians.length} {t('filter_matching')}
           </p>
         </div>
-
-        <div className="flex items-center gap-3">
-          <div className="relative w-64 md:w-80">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-text-secondary" />
+        <div className="flex items-center gap-2">
+          <div className="relative w-56 md:w-72">
+            <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-text-muted" />
             <input
               type="text"
-              placeholder="Search by name, state, constituency..."
+              placeholder={t('search_placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-bg-card border border-border-subtle rounded-lg pl-9 pr-4 py-2 text-sm font-sans focus:outline-none focus:border-accent-gold transition-colors text-text-primary"
+              className="w-full bg-bg-primary border border-border-subtle rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-accent-gold/50 transition-colors text-text-primary"
             />
             {searchQuery && (
-              <button 
+              <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-2.5 text-text-secondary hover:text-text-primary"
+                className="absolute right-3 top-2.5 text-text-muted hover:text-text-primary transition-colors"
               >
-                <X size={16} />
+                <X size={14} />
               </button>
             )}
           </div>
-          
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleResetFilters} 
-            className="text-xs flex items-center gap-1 border-border-subtle"
+
+          <button
+            onClick={handleResetFilters}
+            className="text-xs flex items-center gap-1.5 border border-border-subtle px-3 py-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg-elevated transition-all"
           >
-            <RotateCcw size={12} /> Reset
-          </Button>
+            <RotateCcw size={12} /> {t('reset')}
+          </button>
         </div>
       </div>
 
@@ -288,25 +288,23 @@ const Browse = () => {
       <div className="flex flex-1 overflow-hidden">
         
         {/* PANEL 1: Left Filters Sidebar (Scrollable) */}
-        <aside className="w-80 bg-bg-secondary/60 border-r border-border-subtle overflow-y-auto hidden lg:block p-5 space-y-6 shrink-0">
+        <aside className="w-72 bg-bg-secondary/50 border-r border-border-subtle overflow-y-auto hidden lg:block p-4 space-y-5 shrink-0">
           <div className="flex items-center justify-between border-b border-border-subtle pb-3">
-            <h2 className="text-sm uppercase tracking-wider text-text-secondary font-bold flex items-center gap-2">
-              <Filter size={14} className="text-accent-gold" /> Filter Parameters
+            <h2 className="text-xs uppercase tracking-widest text-text-secondary font-bold flex items-center gap-2">
+              <Filter size={12} className="text-accent-gold" /> Filters
             </h2>
-            <span className="text-[10px] bg-bg-card border border-border-subtle text-accent-gold px-2 py-0.5 rounded font-mono">
-              ACTIVE
-            </span>
+            <span className="tag-gold">LIVE</span>
           </div>
 
           {/* State Filter */}
-          <div className="space-y-2">
-            <label className="text-xs uppercase text-text-secondary font-bold tracking-wider block">State/Territory</label>
+          <div className="space-y-1.5">
+            <label className="text-[10px] uppercase text-text-muted font-bold tracking-widest block font-mono">{t('filter_state')}</label>
             <select
               value={selectedState}
               onChange={(e) => setSelectedState(e.target.value)}
-              className="w-full bg-bg-card border border-border-subtle rounded px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-accent-gold"
+              className="select-field w-full"
             >
-              <option value="all">All States</option>
+              <option value="all">{t('filter_all_states')}</option>
               {uniqueStates.filter(s => s !== 'all').map(state => (
                 <option key={state} value={state}>{state}</option>
               ))}
@@ -314,14 +312,14 @@ const Browse = () => {
           </div>
 
           {/* Party Filter */}
-          <div className="space-y-2">
-            <label className="text-xs uppercase text-text-secondary font-bold tracking-wider block">Political Party</label>
+          <div className="space-y-1.5">
+            <label className="text-[10px] uppercase text-text-muted font-bold tracking-widest block font-mono">{t('filter_party')}</label>
             <select
               value={selectedParty}
               onChange={(e) => setSelectedParty(e.target.value)}
-              className="w-full bg-bg-card border border-border-subtle rounded px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-accent-gold"
+              className="select-field w-full"
             >
-              <option value="all">All Parties</option>
+              <option value="all">{t('filter_all_parties')}</option>
               {uniqueParties.filter(p => p !== 'all').map(party => (
                 <option key={party} value={party}>{party}</option>
               ))}
@@ -329,21 +327,21 @@ const Browse = () => {
           </div>
 
           {/* Role Filter */}
-          <div className="space-y-2">
-            <label className="text-xs uppercase text-text-secondary font-bold tracking-wider block">Governance Role</label>
+          <div className="space-y-1.5">
+            <label className="text-[10px] uppercase text-text-muted font-bold tracking-widest block font-mono">{t('filter_role')}</label>
             <select
               value={selectedRole}
               onChange={(e) => {
                 setSelectedRole(e.target.value);
                 setSearchParams(e.target.value === 'all' ? {} : { role: e.target.value });
               }}
-              className="w-full bg-bg-card border border-border-subtle rounded px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-accent-gold"
+              className="select-field w-full"
             >
-              <option value="all">All Roles</option>
-              <option value="mp">Members of Parliament (MPs)</option>
-              <option value="mla">Members of Legislative Assembly (MLAs)</option>
-              <option value="corporator">Municipal Corporators</option>
-              <option value="executive">Ministers & Chiefs (PM, CM, Ministers)</option>
+              <option value="all">{t('filter_all_roles')}</option>
+              <option value="mp">{t('filter_mp')}</option>
+              <option value="mla">{t('filter_mla')}</option>
+              <option value="corporator">{t('filter_corp')}</option>
+              <option value="executive">{t('filter_minister')}</option>
             </select>
           </div>
 
@@ -412,17 +410,17 @@ const Browse = () => {
           </div>
 
           {/* Asset Bracket */}
-          <div className="space-y-2">
-            <label className="text-xs uppercase text-text-secondary font-bold tracking-wider block">Asset Bracket</label>
+          <div className="space-y-1.5">
+            <label className="text-[10px] uppercase text-text-muted font-bold tracking-widest block font-mono">Asset Bracket</label>
             <select
               value={selectedNetWorth}
               onChange={(e) => setSelectedNetWorth(e.target.value)}
-              className="w-full bg-bg-card border border-border-subtle rounded px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-accent-gold"
+              className="select-field w-full"
             >
-              <option value="all">Any Asset Net Worth</option>
+              <option value="all">Any Net Worth</option>
               <option value="under-1">Under ₹1 Crore</option>
-              <option value="1-10">₹1 Crore - ₹10 Crores</option>
-              <option value="10-100">₹10 Crores - ₹100 Crores</option>
+              <option value="1-10">₹1 – ₹10 Crores</option>
+              <option value="10-100">₹10 – ₹100 Crores</option>
               <option value="100-plus">₹100 Crores +</option>
             </select>
           </div>

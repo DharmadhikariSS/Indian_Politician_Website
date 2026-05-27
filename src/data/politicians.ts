@@ -93,6 +93,34 @@ export interface DetailedPoliticianData extends PoliticianData {
   localWardFundUtilization?: number;
   grievanceRedressPct?: number;
   conflictLedger?: ConflictAlert[];
+
+  // v5.0 Career Journey & Dynasty Fields
+  howEnteredPolitics?: string;
+  studentPolitics?: string;
+  partyHistory?: {
+    party: string;
+    from: number;
+    to?: number;
+    role: string;
+  }[];
+  familyConnections?: {
+    name: string;
+    relation: string;
+    role: string;
+    party: string;
+    yearsActive: string;
+  }[];
+  careerTimeline?: {
+    year: number;
+    event: string;
+    role: string;
+    party: string;
+    constituency?: string;
+    type: 'election_win' | 'election_loss' | 'party_join' | 'role_appointed' | 'controversy' | 'achievement' | 'entry';
+    details: string;
+    result?: 'won' | 'lost' | 'appointed' | 'resigned';
+    margin?: number;
+  }[];
 }
 
 // =============================================================================
@@ -229,6 +257,117 @@ export const mockPoliticians: DetailedPoliticianData[] = [
         hiddenConnection: 'Major corporate donors (such as Future Gaming and Megha Engineering) donating hundreds of crores shortly before winning mega-infrastructure tenders.',
         policyNexus: 'Legislation authorizing anonymous commercial donations to political parties under the guise of black money eradication.',
         citizenRiskScore: 8.5
+      }
+    ],
+    howEnteredPolitics: 'Narendra Modi joined the RSS (Rashtriya Swayamsevak Sangh) as a young child in Vadnagar, Gujarat. He worked his way up through the RSS ranks as a pracharak (full-time worker), renouncing family life. He joined the BJP in 1987 and steadily rose through party ranks, working as an organizational secretary. He was assigned to Gujarat as the BJP\'s election strategist in 2001, eventually being appointed Chief Minister of Gujarat after Keshubhai Patel resigned.',
+    studentPolitics: 'Active in ABVP (Akhil Bharatiya Vidyarthi Parishad — BJP\'s student wing) at Gujarat University in the 1970s.',
+    partyHistory: [
+      { party: 'RSS', from: 1958, to: 1987, role: 'Pracharak (Full-time Worker)' },
+      { party: 'BJP', from: 1987, role: 'Member → General Secretary (Org.) → CM Gujarat → PM India' }
+    ],
+    familyConnections: [],
+    careerTimeline: [
+      {
+        year: 1958,
+        event: 'Joins RSS as a Bal Swayamsevak',
+        role: 'RSS Volunteer',
+        party: 'RSS',
+        type: 'entry',
+        details: 'Modi joined the RSS at age 8 in Vadnagar, Gujarat. He was introduced to the organization\'s discipline and ideology from a very young age and went on to become a full-time pracharak (volunteer-in-residence) after college.',
+        result: 'appointed'
+      },
+      {
+        year: 1987,
+        event: 'Joins Bharatiya Janata Party',
+        role: 'BJP Organizational Secretary',
+        party: 'BJP',
+        type: 'party_join',
+        details: 'After leaving the RSS as a full-time worker, Modi formally joined the BJP. He worked as an election strategist and organizational general secretary, helping the party expand in Gujarat and later at the national level.',
+        result: 'appointed'
+      },
+      {
+        year: 1995,
+        event: 'Appointed BJP General Secretary (Organization)',
+        role: 'National General Secretary',
+        party: 'BJP',
+        type: 'role_appointed',
+        details: 'Modi was appointed as BJP\'s National General Secretary (Organization) in 1995, responsible for coordinating party structure across states. This role gave him national visibility and political experience beyond Gujarat.',
+        result: 'appointed'
+      },
+      {
+        year: 2001,
+        event: 'Sworn in as Chief Minister of Gujarat',
+        role: 'Chief Minister, Gujarat',
+        party: 'BJP',
+        type: 'role_appointed',
+        details: 'Following Keshubhai Patel\'s resignation amid health issues and party factional pressures, Modi was appointed CM of Gujarat without contesting an election. He was subsequently elected from the Rajkot-II seat in a by-election.',
+        result: 'appointed'
+      },
+      {
+        year: 2002,
+        event: 'Gujarat Vidhan Sabha Election — Elected from Maninagar',
+        role: 'CM / MLA Maninagar',
+        party: 'BJP',
+        constituency: 'Maninagar, Gujarat',
+        type: 'election_win',
+        details: 'Won his first competitive election from the Maninagar constituency in the 2002 Gujarat state elections. BJP swept to power with a large majority. The election followed the 2002 Gujarat riots, which remained a significant political controversy.',
+        result: 'won',
+        margin: 75554
+      },
+      {
+        year: 2007,
+        event: 'Gujarat Vidhan Sabha Re-elected from Maninagar',
+        role: 'CM / MLA Maninagar (2nd term)',
+        party: 'BJP',
+        constituency: 'Maninagar, Gujarat',
+        type: 'election_win',
+        details: 'Returned to power with an even larger mandate in 2007, seen as a validation of his "Gujarat Development Model." Campaigned on issues of infrastructure, power sector reform, and Vibrant Gujarat industrial summits.',
+        result: 'won',
+        margin: 80277
+      },
+      {
+        year: 2012,
+        event: 'Gujarat Vidhan Sabha — Third consecutive win from Maninagar',
+        role: 'CM Gujarat (3rd term)',
+        party: 'BJP',
+        constituency: 'Maninagar, Gujarat',
+        type: 'election_win',
+        details: 'Won a third consecutive term as CM, cementing his position as one of the longest-serving Gujarat CMs. The "MODI wave" began to be discussed at the national level, with his name circulating as a potential PM candidate.',
+        result: 'won',
+        margin: 86373
+      },
+      {
+        year: 2014,
+        event: 'Lok Sabha — Elected from Vadodara & Varanasi (retained Varanasi)',
+        role: 'MP Lok Sabha / Prime Minister of India',
+        party: 'BJP',
+        constituency: 'Varanasi, UP',
+        type: 'election_win',
+        details: 'Won simultaneously from Varanasi (UP) and Vadodara (Gujarat), choosing to retain Varanasi. Led BJP to historic 282-seat majority. Sworn in as 14th Prime Minister of India on May 26, 2014.',
+        result: 'won',
+        margin: 371784
+      },
+      {
+        year: 2019,
+        event: 'Lok Sabha — Re-elected from Varanasi with larger margin',
+        role: 'Prime Minister / MP Varanasi',
+        party: 'BJP',
+        constituency: 'Varanasi, UP',
+        type: 'election_win',
+        details: 'Re-elected as PM with BJP winning 303 seats. Won Varanasi by a margin of 4.79 lakh votes — one of the largest margins in the country. Announced Ayushman Bharat health insurance scheme as a key achievement.',
+        result: 'won',
+        margin: 479505
+      },
+      {
+        year: 2024,
+        event: 'Lok Sabha — Third consecutive win from Varanasi (reduced majority)',
+        role: 'Prime Minister / MP Varanasi (3rd term)',
+        party: 'BJP',
+        constituency: 'Varanasi, UP',
+        type: 'election_win',
+        details: 'BJP\'s seat count dropped from 303 to 240 in 2024, forcing a coalition government with JDU and TDP. Modi won Varanasi with a reduced margin as INDIA bloc candidate Ajay Rai mounted a stronger challenge.',
+        result: 'won',
+        margin: 152513
       }
     ]
   },
@@ -371,6 +510,93 @@ export const mockPoliticians: DetailedPoliticianData[] = [
         hiddenConnection: 'Shareholder (along with Sonia Gandhi) in Young Indian, which acquired Associated Journals Ltd, taking control of prime assets in Delhi, Mumbai, and Lucknow.',
         policyNexus: 'Historical state land leases granted to the National Herald for journalism purposes, later repurposed to generate commercial lease revenues.',
         citizenRiskScore: 7.2
+      }
+    ],
+    howEnteredPolitics: 'Rahul Gandhi was born into the Nehru-Gandhi dynasty — India\'s most powerful political family. After completing his education at Cambridge and Harvard, he returned to India and was fielded in the 2004 Lok Sabha election from Amethi, UP — a constituency held by his father Rajiv Gandhi. He entered politics not as an activist or grassroots worker, but as a hereditary candidate who won Amethi comfortably due to the family legacy.',
+    studentPolitics: 'No formal student politics involvement documented. Studied at Rollins College (USA), Trinity College Cambridge, and Harvard\'s Kennedy School.',
+    partyHistory: [
+      { party: 'INC', from: 2004, role: 'MP → General Secretary → VP → President (2017-19) → National President (2022-)' }
+    ],
+    familyConnections: [
+      { name: 'Sonia Gandhi', relation: 'Mother', role: 'MP Rajya Sabha, Former INC President', party: 'INC', yearsActive: '1999–Present' },
+      { name: 'Priyanka Gandhi Vadra', relation: 'Sister', role: 'MP Lok Sabha (Wayanad), INC General Secretary', party: 'INC', yearsActive: '2019–Present' },
+      { name: 'Rajiv Gandhi', relation: 'Father (Deceased)', role: 'Prime Minister of India (1984-89)', party: 'INC', yearsActive: '1981–1991' },
+      { name: 'Indira Gandhi', relation: 'Grandmother (Deceased)', role: 'Prime Minister of India (1966-84)', party: 'INC', yearsActive: '1964–1984' },
+      { name: 'Jawaharlal Nehru', relation: 'Great-Grandfather (Deceased)', role: 'First Prime Minister of India', party: 'INC', yearsActive: '1947–1964' }
+    ],
+    careerTimeline: [
+      {
+        year: 2004,
+        event: 'First Lok Sabha Election — Wins from Amethi',
+        role: 'MP Lok Sabha',
+        party: 'INC',
+        constituency: 'Amethi, UP',
+        type: 'election_win',
+        details: 'Won the Amethi seat from the Congress stronghold by a large margin. It was a family seat — Rajiv Gandhi had represented it before him. Won his first election during the UPA wave against the NDA government under Atal Bihari Vajpayee.',
+        result: 'won',
+        margin: 157438
+      },
+      {
+        year: 2009,
+        event: 'Re-elected from Amethi — UPA wave election',
+        role: 'MP Lok Sabha',
+        party: 'INC',
+        constituency: 'Amethi, UP',
+        type: 'election_win',
+        details: 'Won Amethi again with an increased margin in the 2009 general elections which saw the UPA return to power with a stronger mandate. Was appointed General Secretary of the Congress party.',
+        result: 'won',
+        margin: 370198
+      },
+      {
+        year: 2013,
+        event: 'Appointed Vice President of Indian National Congress',
+        role: 'INC Vice President',
+        party: 'INC',
+        type: 'role_appointed',
+        details: 'Formally elevated to INC VP position, signalling his grooming as a future PM candidate. Led Congress\'s 2014 Lok Sabha campaign with limited success.',
+        result: 'appointed'
+      },
+      {
+        year: 2014,
+        event: 'Re-elected from Amethi despite BJP wave — Congress collapses nationally',
+        role: 'MP Lok Sabha',
+        party: 'INC',
+        constituency: 'Amethi, UP',
+        type: 'election_win',
+        details: 'Won Amethi with a significantly reduced margin (107,903) despite BJP\'s historic 282-seat wave. Congress fell to just 44 seats nationally. Led the Congress campaign which was widely considered a failure.',
+        result: 'won',
+        margin: 107903
+      },
+      {
+        year: 2017,
+        event: 'Elected President of the Indian National Congress',
+        role: 'INC National President',
+        party: 'INC',
+        type: 'role_appointed',
+        details: 'Officially became INC National President in December 2017, succeeding his mother Sonia Gandhi. Led Congress in 2018 state elections in Rajasthan, MP and Chhattisgarh — Congress won all three.',
+        result: 'appointed'
+      },
+      {
+        year: 2019,
+        event: 'LOST Amethi to Smriti Irani — Won Wayanad (BJP wave)',
+        role: 'MP Lok Sabha (Wayanad)',
+        party: 'INC',
+        constituency: 'Wayanad, Kerala',
+        type: 'election_loss',
+        details: 'In a stunning defeat, lost the family stronghold of Amethi to BJP\'s Smriti Irani by 55,120 votes. Had contested from Wayanad (Kerala) as a safety seat and won there. Resigned as INC President after the results.',
+        result: 'lost',
+        margin: 55120
+      },
+      {
+        year: 2024,
+        event: 'Won Wayanad & Rae Bareli — Led INDIA bloc as LoP',
+        role: 'Leader of Opposition, MP Lok Sabha',
+        party: 'INC',
+        constituency: 'Rae Bareli, UP',
+        type: 'election_win',
+        details: 'Won from both Wayanad and Rae Bareli (ancestral Gandhi constituency). Retained Rae Bareli, with Priyanka Gandhi Vadra taking the Wayanad seat in the by-election. Became Leader of Opposition in the 18th Lok Sabha.',
+        result: 'won',
+        margin: 390030
       }
     ]
   },

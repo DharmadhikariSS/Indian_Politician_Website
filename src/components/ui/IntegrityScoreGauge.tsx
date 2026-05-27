@@ -8,80 +8,108 @@ interface IntegrityScoreGaugeProps {
   showLabel?: boolean;
 }
 
-export function IntegrityScoreGauge({ 
-  score, 
-  size = 'md', 
+const getScoreConfig = (score: number) => {
+  if (score >= 71) return {
+    color: 'text-success-green',
+    stroke: '#10B981',
+    glow: 'rgba(16, 185, 129, 0.3)',
+    label: 'TRUSTED',
+  };
+  if (score >= 41) return {
+    color: 'text-warning-amber',
+    stroke: '#F59E0B',
+    glow: 'rgba(245, 158, 11, 0.3)',
+    label: 'MODERATE',
+  };
+  return {
+    color: 'text-danger-red',
+    stroke: '#FF4D4D',
+    glow: 'rgba(255, 77, 77, 0.3)',
+    label: 'HIGH RISK',
+  };
+};
+
+export function IntegrityScoreGauge({
+  score,
+  size = 'md',
   className,
-  showLabel = true 
+  showLabel = true,
 }: IntegrityScoreGaugeProps) {
-  // Determine color based on score
-  let colorClass = 'text-success-green';
-  let strokeColor = '#38A169'; // success green
-  
-  if (score <= 40) {
-    colorClass = 'text-danger-red';
-    strokeColor = '#E53E3E'; // danger red
-  } else if (score <= 65) {
-    colorClass = 'text-warning-amber';
-    strokeColor = '#ED8936'; // warning amber
-  } else if (score <= 85) {
-    colorClass = 'text-info-blue';
-    strokeColor = '#4299E1'; // info blue
-  }
+  const { color, stroke, glow, label } = getScoreConfig(score);
 
   const sizeMap = {
-    sm: { width: 48, strokeWidth: 4, textClass: 'text-xs' },
+    sm: { width: 44, strokeWidth: 4, textClass: 'text-[11px]' },
     md: { width: 64, strokeWidth: 5, textClass: 'text-sm' },
-    lg: { width: 96, strokeWidth: 8, textClass: 'text-2xl' },
-    xl: { width: 144, strokeWidth: 12, textClass: 'text-4xl' },
+    lg: { width: 96, strokeWidth: 7, textClass: 'text-xl' },
+    xl: { width: 140, strokeWidth: 10, textClass: 'text-4xl' },
   };
 
-  const currentSize = sizeMap[size];
-  const radius = (currentSize.width - currentSize.strokeWidth) / 2;
-  const circumference = radius * 2 * Math.PI;
-  const strokeDashoffset = circumference - (score / 100) * circumference;
+  const s = sizeMap[size];
+  const radius = (s.width - s.strokeWidth * 2) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const dashOffset = circumference - (score / 100) * circumference;
 
   return (
-    <div className={cn("relative flex flex-col items-center justify-center", className)}>
-      <div className="relative" style={{ width: currentSize.width, height: currentSize.width }}>
+    <div className={cn('relative flex flex-col items-center justify-center', className)}>
+      <div className="relative" style={{ width: s.width, height: s.width }}>
         <svg
           className="transform -rotate-90 w-full h-full"
-          viewBox={`0 0 ${currentSize.width} ${currentSize.width}`}
+          viewBox={`0 0 ${s.width} ${s.width}`}
         >
-          {/* Background circle */}
+          {/* Drop shadow filter for glow */}
+          <defs>
+            <filter id={`glow-${score}`}>
+              <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+              <feMerge>
+                <feMergeNode in="coloredBlur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+
+          {/* Track */}
           <circle
-            className="text-border-subtle"
-            strokeWidth={currentSize.strokeWidth}
-            stroke="currentColor"
+            strokeWidth={s.strokeWidth}
+            stroke="rgba(255,255,255,0.06)"
             fill="transparent"
             r={radius}
-            cx={currentSize.width / 2}
-            cy={currentSize.width / 2}
+            cx={s.width / 2}
+            cy={s.width / 2}
           />
-          {/* Foreground circle */}
+
+          {/* Progress arc */}
           <circle
             className="transition-all duration-1000 ease-out"
-            strokeWidth={currentSize.strokeWidth}
+            strokeWidth={s.strokeWidth}
             strokeDasharray={circumference}
-            strokeDashoffset={strokeDashoffset}
+            strokeDashoffset={dashOffset}
             strokeLinecap="round"
-            stroke={strokeColor}
+            stroke={stroke}
             fill="transparent"
             r={radius}
-            cx={currentSize.width / 2}
-            cy={currentSize.width / 2}
+            cx={s.width / 2}
+            cy={s.width / 2}
+            filter={`url(#glow-${score})`}
           />
         </svg>
+
+        {/* Score number */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className={cn("font-mono font-bold", colorClass, currentSize.textClass)}>
+          <span className={cn('font-mono font-black leading-none', color, s.textClass)}>
             {score}
           </span>
         </div>
       </div>
+
       {showLabel && (
-        <span className="text-[10px] uppercase tracking-wider text-text-secondary mt-2 font-semibold">
-          AI Score
-        </span>
+        <div className="mt-2 text-center">
+          <span className={cn('text-[9px] font-mono font-black uppercase tracking-widest', color)}>
+            {label}
+          </span>
+          <div className={cn('text-[8px] font-mono text-text-muted mt-0.5')}>
+            AI SCORE
+          </div>
+        </div>
       )}
     </div>
   );
