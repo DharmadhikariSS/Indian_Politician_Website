@@ -1,9 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
 import fs from 'fs';
 
-const SUPABASE_URL = "https://wcwufsyroraeirgeoaes.supabase.co";
+import dotenv from 'dotenv';
+dotenv.config();
+
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL || "https://wcwufsyroraeirgeoaes.supabase.co";
 // We use the Service Role Secret Key which has bypass RLS/write bypass rules!
-const SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indjd3Vmc3lyb3JhZWlyZ2VvYWVzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3OTc5NzE5MywiZXhwIjoyMDk1MzczMTkzfQ.wp2H_R78rsgfCYrngGKguzO2XMlKf1GKrJYrHVpb8rc";
+const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
   auth: {
