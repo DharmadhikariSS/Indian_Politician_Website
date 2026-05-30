@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, Link, NavLink, useLocation } from 'react-router-dom';
 import {
   Search, Map as MapIcon, BarChart3, Info, Home, GitCompare,
-  ShieldCheck, Sparkles, Menu, X, AlertTriangle
+  ShieldCheck, Sparkles, Menu, X, AlertTriangle, Sun, Moon
 } from 'lucide-react';
 import { LanguageSwitcher } from '../ui/LanguageSwitcher';
 import { useI18n } from '../../i18n/translations';
@@ -30,12 +30,31 @@ const Layout = () => {
   const { t } = useI18n();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>(
+    (localStorage.getItem('theme') as 'light' | 'dark') || 'dark'
+  );
   const location = useLocation();
 
   // Collapse mobile nav on route change
   useEffect(() => {
     setMobileOpen(false);
   }, [location.pathname]);
+
+  // Sync Theme with DOM
+  useEffect(() => {
+    if (theme === 'light') {
+      document.documentElement.classList.add('light');
+    } else {
+      document.documentElement.classList.remove('light');
+    }
+  }, [theme]);
+
+  // Toggle Theme helper
+  const toggleTheme = () => {
+    const nextTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(nextTheme);
+    localStorage.setItem('theme', nextTheme);
+  };
 
   // Add scroll shadow to header
   useEffect(() => {
@@ -106,6 +125,14 @@ const Layout = () => {
           {/* Right Actions */}
           <div className="flex items-center gap-2">
             <LanguageSwitcher />
+            {/* Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg text-text-secondary hover:text-accent-gold hover:bg-bg-elevated border border-border-subtle transition-all duration-200 cursor-pointer"
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+            </button>
             <Link
               to="/search"
               className="p-2 rounded-lg text-text-secondary hover:text-accent-gold hover:bg-bg-elevated border border-border-subtle transition-all duration-200"

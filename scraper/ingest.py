@@ -27,6 +27,8 @@ load_env()
 # Retrieve credentials
 SUPABASE_URL = os.environ.get("VITE_SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("VITE_SUPABASE_ANON_KEY")
+# Falls back to hardcoded Service Role Key if not defined in .env
+SUPABASE_SERVICE_ROLE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indjd3Vmc3lyb3JhZWlyZ2VvYWVzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3OTc5NzE5MywiZXhwIjoyMDk1MzczMTkzfQ.wp2H_R78rsgfCYrngGKguzO2XMlKf1GKrJYrHVpb8rc"
 
 if not SUPABASE_URL or not SUPABASE_KEY or "placeholder" in SUPABASE_URL or "your-project-id" in SUPABASE_URL:
     print("ERROR: Please set active VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY environment variables in .env.")
@@ -42,8 +44,8 @@ def ensure_storage_bucket():
     logging.info("Checking/Creating 'portraits' Supabase Storage bucket...")
     endpoint = f"{SUPABASE_URL}/storage/v1/bucket"
     headers = {
-        "apikey": SUPABASE_KEY,
-        "Authorization": f"Bearer {SUPABASE_KEY}",
+        "apikey": SUPABASE_SERVICE_ROLE_KEY,
+        "Authorization": f"Bearer {SUPABASE_SERVICE_ROLE_KEY}",
         "Content-Type": "application/json"
     }
     payload = {
@@ -105,8 +107,8 @@ def cache_image_to_supabase(candidate_id, photo_url):
         upload_endpoint = f"{SUPABASE_URL}/storage/v1/object/portraits/{filename}"
         
         upload_headers = {
-            "apikey": SUPABASE_KEY,
-            "Authorization": f"Bearer {SUPABASE_KEY}",
+            "apikey": SUPABASE_SERVICE_ROLE_KEY,
+            "Authorization": f"Bearer {SUPABASE_SERVICE_ROLE_KEY}",
             "Content-Type": content_type
         }
 
