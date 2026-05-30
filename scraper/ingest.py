@@ -154,9 +154,11 @@ def main():
     if has_external_images:
         has_bucket = ensure_storage_bucket()
 
-    # 2. Iterate and Cache Portrait Images
+    # 2. Iterate and Cache Portrait Images & Standardize Keys
+    clean_data = []
     for politician in data:
-        p_id = politician.get("id") or politician.get("name").lower().replace(" ", "-")
+        p_name = politician.get("name", "Unknown Politician")
+        p_id = politician.get("id") or p_name.lower().replace(" ", "-")
         # Ensure politician has an ID
         politician["id"] = p_id
         photo_url = politician.get("photoUrl")
@@ -164,6 +166,48 @@ def main():
             # Try to upload external image to bucket
             cached_url = cache_image_to_supabase(p_id, photo_url)
             politician["photoUrl"] = cached_url
+            
+        clean_data.append({
+            "id": p_id,
+            "name": p_name,
+            "role": politician.get("role", "MLA"),
+            "party": politician.get("party", "IND"),
+            "state": politician.get("state", "India"),
+            "photoUrl": politician.get("photoUrl", ""),
+            "isVerified": politician.get("isVerified", True),
+            "aiScore": int(politician.get("aiScore", 60)),
+            "netWorth": politician.get("netWorth", "0Cr"),
+            "netWorthGrowth": float(politician.get("netWorthGrowth", 15.0)),
+            "criminalCases": int(politician.get("criminalCases", 0)),
+            "attendancePct": int(politician.get("attendancePct")) if politician.get("attendancePct") is not None else None,
+            "isAttendanceExempt": bool(politician.get("isAttendanceExempt", False)),
+            "attendanceExemptReason": politician.get("attendanceExemptReason"),
+            "gender": politician.get("gender", "Male"),
+            "age": int(politician.get("age", 50)),
+            "constituency": politician.get("constituency", "Unknown Constituency"),
+            "termCount": int(politician.get("termCount", 1)),
+            "education": politician.get("education", "Graduate"),
+            "panNumber": politician.get("panNumber", "N/A"),
+            "activeSince": int(politician.get("activeSince", 2015)),
+            "biography": politician.get("biography", ""),
+            "pincodes": politician.get("pincodes", []),
+            "municipalWard": politician.get("municipalWard"),
+            "strongestOpponentId": politician.get("strongestOpponentId"),
+            "agendaExecutionRate": int(politician.get("agendaExecutionRate")) if politician.get("agendaExecutionRate") is not None else None,
+            "localWardFundUtilization": int(politician.get("localWardFundUtilization")) if politician.get("localWardFundUtilization") is not None else None,
+            "grievanceRedressPct": int(politician.get("grievanceRedressPct")) if politician.get("grievanceRedressPct") is not None else None,
+            "conflictLedger": politician.get("conflictLedger", []),
+            "flags": politician.get("flags", {}),
+            "integrityDetails": politician.get("integrityDetails", {}),
+            "financialTimeline": politician.get("financialTimeline", []),
+            "criminalCaseList": politician.get("criminalCaseList", []),
+            "parliamentActivity": politician.get("parliamentActivity", {}),
+            "electoralBonds": politician.get("electoralBonds", []),
+            "newsArticles": politician.get("newsArticles", []),
+            "manifestoPledges": politician.get("manifestoPledges", []),
+            "manifestoSectorBreakdown": politician.get("manifestoSectorBreakdown", []),
+            "constituencyRivalry": politician.get("constituencyRivalry", {})
+        })
 
     # Save cached URLs back to JSON file to maintain consistency
     try:
@@ -183,7 +227,7 @@ def main():
         "Prefer": "resolution=merge-duplicates"
     }
 
-    response = requests.post(endpoint, json=data, headers=headers)
+    response = requests.post(endpoint, json=clean_data, headers=headers)
     
     if response.status_code in [200, 201]:
         print("Success! Data successfully ingested to Supabase database.")

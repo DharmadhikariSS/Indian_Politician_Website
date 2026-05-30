@@ -141,15 +141,19 @@ class IngestionPipelineOrchestrator:
 
         # Find all anchor links referencing candidates
         # Typically of format: candidate.php?candidate_id=X
+        from urllib.parse import urljoin, urlparse
+        parsed_index = urlparse(index_url)
+        path_parts = [p for p in parsed_index.path.split('/') if p]
+        election_dir = path_parts[0] if path_parts else None
+
         for a in soup.find_all("a", href=True):
             href = a["href"]
             if "candidate.php" in href:
-                # Resolve relative URL if needed
-                full_url = href
-                if href.startswith("candidate"):
-                    base_dir = os.path.dirname(index_url)
-                    full_url = f"{base_dir}/{href}"
+                # If index has an election directory segment, ensure the link contains it too
+                if election_dir and election_dir not in href:
+                    continue # Skip invalid/root candidate links that cause Page Not Found errors
                 
+                full_url = urljoin(index_url, href)
                 if full_url not in candidate_links:
                     candidate_links.append(full_url)
 

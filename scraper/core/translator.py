@@ -43,27 +43,25 @@ class RegionalTranslator:
         clean_str = val_str.replace("₹", "").replace("Rs", "").replace("Rs.", "").replace(",", "").replace("+", "").strip().lower()
 
         try:
-            # Handle explicit words like "crore", "crores", "cr" or "lakh", "lakhs", "lac"
-            if "crore" in clean_str or "cr" in clean_str:
-                num_part = re.findall(r"[\d\.]+", clean_str)
-                if num_part:
-                    return float(num_part[0])
-            elif "lakh" in clean_str or "lac" in clean_str or "lacs" in clean_str:
-                num_part = re.findall(r"[\d\.]+", clean_str)
-                if num_part:
-                    # 1 Lakh = 0.01 Crore
-                    return round(float(num_part[0]) / 100.0, 4)
-            
-            # If it's a raw large number (e.g. "45000000" for 4.5Cr)
             num_part = re.findall(r"[\d\.]+", clean_str)
-            if num_part:
-                raw_val = float(num_part[0])
-                if raw_val >= 10000000:  # >= 1 Crore
-                    return round(raw_val / 10000000.0, 4)
-                elif raw_val >= 100000:  # >= 1 Lakh
-                    return round(raw_val / 10000000.0, 4)
-                else:
-                    return round(raw_val / 10000000.0, 6)
+            if not num_part:
+                return 0.0
+                
+            first_num = float(num_part[0])
+            
+            # If the first number is a large raw rupee amount (e.g. >= 10000 Rupees),
+            # normalize it directly (divide by 10,000,000) regardless of words in clean_str.
+            if first_num >= 10000:
+                return round(first_num / 10000000.0, 4)
+                
+            # Otherwise, check for crore/lakh multipliers
+            if "crore" in clean_str or "cr" in clean_str:
+                return first_num
+            elif "lakh" in clean_str or "lac" in clean_str or "lacs" in clean_str:
+                return round(first_num / 100.0, 4)
+                
+            # If it's a small raw number (e.g. 5000)
+            return round(first_num / 10000000.0, 6)
         except ValueError:
             pass
 

@@ -7,8 +7,9 @@ This is an enterprise-grade, modular, and legal-compliant Python-based scraping 
 ```
 scraper/
 ├── requirements.txt         # Dependencies
-├── README.md                # Usage Instructions
+├── README.md                # Usage Instructions (This file)
 ├── cli.py                   # Main CLI entry point
+├── ingest.py                # Supabase DB & Storage Ingestion tool
 ├── core/
 │   ├── downloader.py        # Resilient HTTP downloading (proxies, rate limits)
 │   ├── translator.py        # Regional language translator & Indian numeric cleaner (Lakhs/Crores)
@@ -27,31 +28,50 @@ scraper/
 
 ## 🛠️ Setup & Installation
 
-1. Install Python 3.10+ on your system.
+1. Install Python 3.9+ on your system.
 2. Install dependencies:
    ```bash
-   pip install -r requirements.txt
+   pip3 install -r scraper/requirements.txt
    ```
 3. Initialize NLP resources (run once):
    ```bash
-   python -c "import nltk; nltk.download('vader_lexicon')"
+   python3 -c "import nltk; nltk.download('vader_lexicon')"
    ```
 
-## 🚀 Usage
+## 🚀 Step-by-Step Data Harvesting & Ingestion
 
-The suite provides a unified command line interface (`cli.py`):
+To populate your live database with real Indian politicians, follow these simple steps:
 
-### 1. Scrape a specific Candidate
-To scrape and profile a specific politician using their MyNeta profile URL:
+### Step 1: Run the Scraper (Single Candidate or Bulk Crawl)
+
+#### Option A: Bulk Scrape from Election Listings (Recommended)
+To crawl a large number of candidates from an election listing directory (such as Lok Sabha 2024 winners or candidate tables):
 ```bash
-python cli.py --url "https://myneta.info/loksabha2024/candidate.php?candidate_id=123" --output candidate_data.json
+# Scrape the first 30 winners of Lok Sabha 2024 (set --limit 0 for all 543 winners)
+python3 -u scraper/cli.py --bulk "https://myneta.info/LokSabha2024/index.php?action=show_winners" --limit 30 --output scraper/politicians_scraped.json
 ```
 
-### 2. Bulk Scrape an Election Year / State
-To crawl all candidate profiles listed in a MyNeta election directory index page:
+#### Option B: Scrape a Single Candidate
+To profile a specific politician using their exact MyNeta URL:
 ```bash
-python cli.py --bulk "https://myneta.info/loksabha2024/" --state "Delhi" --output Delhi_LokSabha_2024.json
+python3 -u scraper/cli.py --url "https://myneta.info/LokSabha2024/candidate.php?candidate_id=5395" --output scraper/politicians_scraped.json
 ```
 
-### 3. Integrated Full-Source Analysis
-By default, the CLI matches personal profiles against other data sources (attendance, corporate registers, news headlines, and electoral bonds) based on fuzzy matches of the politician's name, DIN, PAN, or constituency, and writes the completed JSON to standard structures.
+### Step 2: Ingest Scraped Data into Supabase
+
+Once you have generated the `scraper/politicians_scraped.json` file, run the ingestion script to synchronize images to the Supabase portraits storage bucket and upsert records to the PostgreSQL database:
+```bash
+python3 scraper/ingest.py
+```
+
+*Note: The script automatically reads your `.env` credentials in the root directory to perform secure PostgREST REST API requests.*
+
+---
+
+## ⚡ Technical Highlights & Improvements
+
+1. **Relative URL Resolution Fix:** Standardized all extracted links using `urllib.parse.urljoin` to prevent "Page Not Found!!" errors caused by root-relative anchors.
+2. **Sub-directory Matching Filter:** Implemented a directory-level segment validator in `cli.py` to filter out invalid duplicate links and correctly target target elections (e.g. `/LokSabha2024/`).
+3. **Pristine HTML Table Extraction:** Custom, ID-specific parsing selectors for `movable_assets`, `immovable_assets`, `liabilities`, `income_tax`, and `cases` tables.
+4. **Combined Financial Value Parsing:** Upgraded the financial parser in `core/translator.py` to robustly extract and normalize large raw Rupee figures (e.g., `Rs 2,58,92,000 2 Crore+` yields mathematically perfect `2.5892` crores) without multiplier confusion.
+5. **PostgREST Key Harmonization:** Built a strict key mapping model inside `ingest.py` to align all parsed JSON dictionaries identically, bypassing Supabase multi-object column mismatches (`PGRST102` error).
