@@ -10,13 +10,9 @@ RUN npm install --legacy-peer-deps
 # Copy the rest of the application
 COPY . .
 
-# Pass build arguments (Supabase variables are needed at build time by Vite)
-ARG VITE_SUPABASE_URL
-ARG VITE_SUPABASE_ANON_KEY
-
-# Set them as environment variables during the build
-ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
-ENV VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY
+# Generate the public Supabase configuration .env file for Vite at build time
+RUN echo "VITE_SUPABASE_URL=https://wcwufsyroraeirgeoaes.supabase.co" > .env && \
+    echo "VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indjd3Vmc3lyb3JhZWlyZ2VvYWVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3OTcxOTMsImV4cCI6MjA5NTM3MzE5M30.ryvNqpXNxykBW154kpXSGQOURzlWYVcrKMfeiXxXBAk" >> .env
 
 # Build the project
 RUN npm run build
